@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>33 숫자 퀴즈</title>
+    <style>
+      /* 깔끔한 디자인을 위한 스타일 */
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+      }
+
+      /* 숫자 카드 그리드 */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .card {
+        padding: 15px;
+        background: #eee;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+      .card:hover {
+        background: #007bff;
+        color: white;
+      }
+
+      /* 문제 페이지 숨기기/보이기 */
+      #quiz-page {
+        display: none;
+      }
+      .btn-back {
+        margin-top: 20px;
+        padding: 10px 20px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background: #333;
+        color: white;
+      }
+      .question-box {
+        font-size: 1.5rem;
+        margin: 30px 0;
+        color: #007bff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- 메인 페이지: 숫자 카드 목록 -->
+      <div id="main-page">
+        <h1>번호를 골라주세요!</h1>
+        <div class="grid" id="card-grid">
+          <!-- 자바스크립트로 1~33번 카드가 생성됩니다 -->
+        </div>
+      </div>
+
+      <!-- 퀴즈 페이지: 개별 문제 보기 -->
+      <div id="quiz-page">
+        <h1 id="quiz-title">0번 문제</h1>
+        <div class="question-box" id="question-text">
+          여기에 문제가 표시됩니다.
+        </div>
+        <button class="btn-back" onclick="goBack()">뒤로 가기</button>
+      </div>
+    </div>
+
+    <script>
+      // 1. 숫자 카드 1~33개 생성
+      const grid = document.getElementById('card-grid');
+      for (let i = 1; i <= 33; i++) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerText = i;
+        card.onclick = () => showQuiz(i);
+        grid.appendChild(card);
+      }
+
+      // 2. 퀴즈 데이터 (여기에 문제를 적으세요)
+      const quizData = {
+        1: '1번 문제의 예시입니다.',
+        2: '2번 문제의 예시입니다.',
+        3: '3번 문제의 예시입니다.',
+        4: '4번 문제의 예시입니다.',
+        5: '5번 문제의 예시입니다.',
+
+        32: '32번 문제의 예시입니다.',
+        33: '마지막 문제입니다. 화이팅!',
+        // 필요한 번호의 문제를 계속 추가하세요. 없는 번호는 기본 문구가 뜹니다.
+      };
+
+      // 3. 문제 보여주기 함수
+      function showQuiz(num) {
+        document.getElementById('main-page').style.display = 'none';
+        document.getElementById('quiz-page').style.display = 'block';
+
+        document.getElementById('quiz-title').innerText = num + '번 문제';
+        document.getElementById('question-text').innerText =
+          quizData[num] || '문제가 아직 등록되지 않았습니다.';
+      }
+
+      // 4. 메인으로 돌아가기
+      function goBack() {
+        document.getElementById('main-page').style.display = 'block';
+        document.getElementById('quiz-page').style.display = 'none';
+      }
+    </script>
+  </body>
+</html>
