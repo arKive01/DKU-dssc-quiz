@@ -11,20 +11,21 @@
         --container-bg: rgba(255, 255, 255, 0.4);
         --text-color: #1d1d1f;
         --card-bg: rgba(255, 255, 255, 0.6);
-        --card-shadow: rgba(31, 38, 135, 0.07);
+        --card-shadow: rgba(0, 0, 0, 0.08);
         --accent-color: #007aff;
         --moon-color: #000000;
+        --toggle-bg: #ffffff;
       }
 
-      /* 다크모드 (On 상태) */
       body.dark-mode {
         --bg-color: #121212;
         --container-bg: rgba(30, 30, 30, 0.4);
         --text-color: #f5f5f7;
         --card-bg: rgba(255, 255, 255, 0.1);
-        --card-shadow: rgba(0, 0, 0, 0.3);
+        --card-shadow: rgba(0, 0, 0, 0.4);
         --accent-color: #0a84ff;
         --moon-color: #ffffff;
+        --toggle-bg: #2c2c2e;
       }
 
       body {
@@ -40,64 +41,63 @@
         transition:
           background-color 0.5s ease,
           color 0.5s ease;
-        overflow-x: hidden;
       }
 
-      /* 리퀴드 글래스 컨테이너 */
       .container {
         max-width: 800px;
-        margin: 40px auto;
+        margin: 60px auto;
         background: var(--container-bg);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding: 40px 20px;
         border-radius: 30px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px var(--card-shadow);
+        box-shadow: 0 10px 40px var(--card-shadow);
       }
 
-      /* 초승달 테마 토글 */
+      /* 업그레이드된 원형 초승달 버튼 */
       .theme-toggle {
         position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--card-bg);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        top: 25px;
+        right: 25px;
+        width: 60px; /* 크기 키움 */
+        height: 60px;
+        border-radius: 50%; /* 완전한 원형 */
+        background: var(--toggle-bg);
+        border: none;
         cursor: pointer;
         z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Off 시 가시성을 위한 그림자 */
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       .theme-toggle svg {
-        width: 22px;
-        height: 22px;
+        width: 28px;
+        height: 28px;
         fill: var(--moon-color);
         transition: fill 0.3s ease;
       }
 
-      /* 숫자 카드 그리드 (반응형 배열) */
+      .theme-toggle:active {
+        transform: scale(0.9);
+      }
+
       .grid {
         display: grid;
         gap: 12px;
         margin-top: 30px;
-        /* 기본 PC 설정: 8열 (8*4 배열) */
         grid-template-columns: repeat(8, 1fr);
       }
 
-      /* 모바일 설정: 4열 (4*8 배열) */
       @media (max-width: 600px) {
         .grid {
           grid-template-columns: repeat(4, 1fr);
         }
       }
 
-      /* 리퀴드 글래스 버튼 디자인 */
       .card {
         aspect-ratio: 1 / 1;
         display: flex;
@@ -105,17 +105,16 @@
         justify-content: center;
         background: var(--card-bg);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 16px;
+        border-radius: 18px;
         font-size: 1.2rem;
         font-weight: 600;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 15px var(--card-shadow);
+        box-shadow: 0 4px 12px var(--card-shadow);
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      /* 버튼 광택 효과 (Liquid Glass 핵심) */
       .card::before {
         content: '';
         position: absolute;
@@ -124,31 +123,19 @@
         right: 0;
         height: 50%;
         background: linear-gradient(
-          rgba(255, 255, 255, 0.2),
+          rgba(255, 255, 255, 0.25),
           rgba(255, 255, 255, 0)
         );
-        pointer-events: none;
       }
 
-      /* 쫀득한 반응형 클릭 애니메이션 */
       .card:active {
-        transform: scale(0.9);
+        transform: scale(0.88);
         filter: brightness(0.9);
-        box-shadow: 0 2px 5px var(--card-shadow);
-      }
-
-      .card:hover {
-        border-color: var(--accent-color);
-        background: rgba(0, 122, 255, 0.1);
-      }
-
-      #quiz-page {
-        display: none;
       }
 
       .question-box {
         font-size: 1.5rem;
-        line-height: 1.7;
+        line-height: 1.8;
         margin: 40px 0;
         color: var(--accent-color);
         white-space: pre-wrap;
@@ -157,36 +144,37 @@
       }
 
       .btn-back {
-        padding: 14px 40px;
-        border-radius: 18px;
+        padding: 15px 45px;
+        border-radius: 20px;
         border: none;
         background: var(--text-color);
         color: var(--bg-color);
         font-size: 1rem;
         font-weight: bold;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
   <body>
-    <!-- 초승달 테마 토글 버튼 (SVG 사용) -->
-    <button class="theme-toggle" onclick="toggleTheme()" aria-label="테마 전환">
-      <svg viewBox="0 0 24 24">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    <!-- 얇은 초승달 SVG가 적용된 원형 버튼 -->
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M12.1,22c-4.9,0-9-3.8-9.1-8.7c0-3.1,1.5-6.1,4.1-8c0.4-0.3,0.9-0.1,1,0.3c0.1,0.4-0.1,0.9-0.5,1.1c-2,1.5-3.1,3.8-3.1,6.3c0.1,3.8,3.2,6.9,7.1,6.9c2.1,0,4.1-0.9,5.5-2.5c0.3-0.3,0.8-0.4,1.1-0.1c0.3,0.3,0.4,0.8,0.1,1.1C16.8,20.6,14.5,22,12.1,22z"
+        />
       </svg>
     </button>
 
     <div class="container">
       <div id="main-page">
-        <h1 style="font-weight: 800; letter-spacing: -1px">
+        <h1 style="font-weight: 800; letter-spacing: -1.5px">
           번호를 골라주세요!
         </h1>
         <div class="grid" id="card-grid"></div>
       </div>
 
       <div id="quiz-page">
-        <h1 id="quiz-title" style="font-size: 1.2rem; opacity: 0.6">
+        <h1 id="quiz-title" style="font-size: 1.1rem; opacity: 0.5">
           0번 문제
         </h1>
         <div class="question-box" id="question-text"></div>
@@ -211,11 +199,16 @@
         32: '마지막 문제입니다. 화이팅!',
       };
 
+      // 개선된 TTS: 줄바꿈 시 잠깐 휴지(Pause) 추가
       function speak(text) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
+
+        // \n을 마침표나 쉼표로 치환하면 TTS 엔진이 자연스럽게 숨을 고릅니다.
+        const pausedText = text.replace(/\n/g, ', ... ');
+
+        const utterance = new SpeechSynthesisUtterance(pausedText);
         utterance.lang = 'ko-KR';
-        utterance.rate = 1.0;
+        utterance.rate = 0.9; // 약간 천천히 읽어 가독성 향상
         window.speechSynthesis.speak(utterance);
       }
 
