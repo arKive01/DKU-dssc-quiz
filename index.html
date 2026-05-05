@@ -8,24 +8,26 @@
     <style>
       :root {
         --bg-color: #ffffff;
-        --container-bg: rgba(255, 255, 255, 0.4);
+        --container-bg: rgba(255, 255, 255, 0.5);
         --text-color: #1d1d1f;
-        --card-bg: rgba(255, 255, 255, 0.6);
-        --card-shadow: rgba(0, 0, 0, 0.08);
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --card-shadow: rgba(0, 0, 0, 0.1);
         --accent-color: #007aff;
         --moon-color: #000000;
         --toggle-bg: #ffffff;
+        --toggle-border: rgba(0, 0, 0, 0.1);
       }
 
       body.dark-mode {
         --bg-color: #121212;
-        --container-bg: rgba(30, 30, 30, 0.4);
+        --container-bg: rgba(30, 30, 30, 0.6);
         --text-color: #f5f5f7;
         --card-bg: rgba(255, 255, 255, 0.1);
-        --card-shadow: rgba(0, 0, 0, 0.4);
+        --card-shadow: rgba(0, 0, 0, 0.5);
         --accent-color: #0a84ff;
         --moon-color: #ffffff;
         --toggle-bg: #2c2c2e;
+        --toggle-border: rgba(255, 255, 255, 0.2);
       }
 
       body {
@@ -38,83 +40,88 @@
         color: var(--text-color);
         margin: 0;
         padding: env(safe-area-inset-top) 20px;
-        transition:
-          background-color 0.5s ease,
-          color 0.5s ease;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .container {
         max-width: 800px;
-        margin: 60px auto;
+        margin: 70px auto;
         background: var(--container-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
         padding: 40px 20px;
-        border-radius: 30px;
+        border-radius: 35px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 10px 40px var(--card-shadow);
+        box-shadow: 0 15px 50px var(--card-shadow);
       }
 
-      /* 업그레이드된 원형 초승달 버튼 */
+      /* 확실하게 보이는 원형 다크모드 버튼 */
       .theme-toggle {
         position: fixed;
         top: 25px;
         right: 25px;
-        width: 60px; /* 크기 키움 */
-        height: 60px;
-        border-radius: 50%; /* 완전한 원형 */
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
         background: var(--toggle-bg);
-        border: none;
+        border: 1px solid var(--toggle-border);
         cursor: pointer;
         z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Off 시 가시성을 위한 그림자 */
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
       }
 
+      /* 얇고 세련된 초승달 SVG */
       .theme-toggle svg {
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         fill: var(--moon-color);
-        transition: fill 0.3s ease;
+        transform: rotate(-15deg);
+        transition:
+          fill 0.3s ease,
+          transform 0.5s ease;
       }
 
       .theme-toggle:active {
-        transform: scale(0.9);
+        transform: scale(0.85);
       }
 
+      /* PC 8*4 / Mobile 4*8 반응형 그리드 */
       .grid {
         display: grid;
-        gap: 12px;
+        gap: 15px;
         margin-top: 30px;
         grid-template-columns: repeat(8, 1fr);
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 768px) {
         .grid {
           grid-template-columns: repeat(4, 1fr);
         }
       }
 
+      /* 리퀴드 글래스 카드 UI */
       .card {
         aspect-ratio: 1 / 1;
         display: flex;
         align-items: center;
         justify-content: center;
         background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 18px;
-        font-size: 1.2rem;
-        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 20px;
+        font-size: 1.3rem;
+        font-weight: 700;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 12px var(--card-shadow);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 6px 15px var(--card-shadow);
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
 
+      /* 유리 질감 광택 하이라이트 */
       .card::before {
         content: '';
         position: absolute;
@@ -123,51 +130,62 @@
         right: 0;
         height: 50%;
         background: linear-gradient(
-          rgba(255, 255, 255, 0.25),
-          rgba(255, 255, 255, 0)
+          180deg,
+          rgba(255, 255, 255, 0.4) 0%,
+          rgba(255, 255, 255, 0) 100%
         );
+        pointer-events: none;
       }
 
       .card:active {
-        transform: scale(0.88);
-        filter: brightness(0.9);
+        transform: scale(0.88) translateY(2px);
+        filter: brightness(0.95);
+        box-shadow: 0 2px 5px var(--card-shadow);
       }
 
       .question-box {
-        font-size: 1.5rem;
-        line-height: 1.8;
+        font-size: 1.6rem;
+        line-height: 1.9;
         margin: 40px 0;
         color: var(--accent-color);
         white-space: pre-wrap;
         word-break: keep-all;
-        font-weight: 500;
+        font-weight: 600;
       }
 
       .btn-back {
-        padding: 15px 45px;
-        border-radius: 20px;
+        padding: 16px 50px;
+        border-radius: 25px;
         border: none;
         background: var(--text-color);
         color: var(--bg-color);
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: bold;
         cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .btn-back:active {
+        transform: scale(0.95);
+      }
+
+      #quiz-page {
+        display: none;
       }
     </style>
   </head>
   <body>
-    <!-- 얇은 초승달 SVG가 적용된 원형 버튼 -->
-    <button class="theme-toggle" onclick="toggleTheme()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <!-- 세련된 초승달 버튼 -->
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+      <svg viewBox="0 0 24 24" id="moonIcon">
         <path
-          d="M12.1,22c-4.9,0-9-3.8-9.1-8.7c0-3.1,1.5-6.1,4.1-8c0.4-0.3,0.9-0.1,1,0.3c0.1,0.4-0.1,0.9-0.5,1.1c-2,1.5-3.1,3.8-3.1,6.3c0.1,3.8,3.2,6.9,7.1,6.9c2.1,0,4.1-0.9,5.5-2.5c0.3-0.3,0.8-0.4,1.1-0.1c0.3,0.3,0.4,0.8,0.1,1.1C16.8,20.6,14.5,22,12.1,22z"
+          d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.17a8.18,8.18,0,0,1-8.17-8.17A8.11,8.11,0,0,1,8,3.06,10.11,10.11,0,0,0,19.08,17.63,8.1,8.1,0,0,1,12.14,19.17Z"
         />
       </svg>
     </button>
 
     <div class="container">
       <div id="main-page">
-        <h1 style="font-weight: 800; letter-spacing: -1.5px">
+        <h1 style="font-weight: 800; letter-spacing: -2px">
           번호를 골라주세요!
         </h1>
         <div class="grid" id="card-grid"></div>
@@ -183,6 +201,7 @@
     </div>
 
     <script>
+      // 1. 숫자 카드 생성
       const grid = document.getElementById('card-grid');
       for (let i = 1; i <= 32; i++) {
         const card = document.createElement('div');
@@ -192,6 +211,7 @@
         grid.appendChild(card);
       }
 
+      // 2. 퀴즈 데이터
       const quizData = {
         1: `모든 시각장애인은 전혀 보지 못한다. \n O/X`,
         2: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데 \n시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
@@ -199,19 +219,21 @@
         32: '마지막 문제입니다. 화이팅!',
       };
 
-      // 개선된 TTS: 줄바꿈 시 잠깐 휴지(Pause) 추가
+      // 3. TTS 기능: 줄바꿈 시 확실한 휴지기 부여
       function speak(text) {
         window.speechSynthesis.cancel();
 
-        // \n을 마침표나 쉼표로 치환하면 TTS 엔진이 자연스럽게 숨을 고릅니다.
-        const pausedText = text.replace(/\n/g, ', ... ');
+        // \n을 마침표와 긴 쉼표로 변경하여 TTS 엔진이 물리적으로 멈추게 함
+        const pausedText = text.replace(/\n/g, '. , . , ');
 
         const utterance = new SpeechSynthesisUtterance(pausedText);
         utterance.lang = 'ko-KR';
-        utterance.rate = 0.9; // 약간 천천히 읽어 가독성 향상
+        utterance.rate = 0.85; // 조금 더 차분하게 읽기
+        utterance.pitch = 1.0;
         window.speechSynthesis.speak(utterance);
       }
 
+      // 4. 페이지 전환 및 퀴즈 표시
       function showQuiz(num) {
         const question = quizData[num] || '문제가 아직 등록되지 않았습니다.';
         document.getElementById('main-page').style.display = 'none';
@@ -229,8 +251,16 @@
         document.getElementById('quiz-page').style.display = 'none';
       }
 
+      // 5. 다크모드 테마 토글
       function toggleTheme() {
         document.body.classList.toggle('dark-mode');
+        const icon = document.getElementById('moonIcon');
+        // 다크모드 시 아이콘 살짝 회전 애니메이션
+        if (document.body.classList.contains('dark-mode')) {
+          icon.style.transform = 'rotate(-45deg)';
+        } else {
+          icon.style.transform = 'rotate(-15deg)';
+        }
       }
     </script>
   </body>
