@@ -3,94 +3,158 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 파비콘 추가 (파일명이 favicon.png라면 아래와 같이 입력) -->
     <link rel="icon" href="Logo-dssc.png" type="image/png" />
     <title>32 숫자 퀴즈</title>
     <style>
-      /* 깔끔한 디자인을 위한 스타일 */
+      :root {
+        --bg-color: #f4f7f6;
+        --container-bg: rgba(255, 255, 255, 0.7);
+        --text-color: #333;
+        --card-bg: rgba(238, 238, 238, 0.5);
+        --accent-color: #007bff;
+        --glass-border: rgba(255, 255, 255, 0.3);
+      }
+
+      /* 고대비 테마 (다크 모드) 설정 */
+      body.dark-mode {
+        --bg-color: #1a1a1a;
+        --container-bg: rgba(45, 45, 45, 0.8);
+        --text-color: #f4f7f6;
+        --card-bg: rgba(60, 60, 60, 0.6);
+        --accent-color: #4dabff;
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+
       body {
-        font-family: sans-serif;
+        font-family: 'Pretendard', sans-serif;
         text-align: center;
-        background-color: #f4f7f6;
+        background-color: var(--bg-color);
+        color: var(--text-color);
         margin: 0;
         padding: 20px;
+        transition: all 0.4s ease;
       }
+
+      /* 리퀴드 글래스 컨테이너 */
       .container {
         max-width: 600px;
         margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        color: #333;
+        background: var(--container-bg);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 30px;
+        border-radius: 25px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
       }
 
-      /* 숫자 카드 그리드 */
+      /* 고대비 전환 플로팅 버튼 */
+      .theme-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      /* 숫자 카드 그리드 & 쫀득한 애니메이션 */
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-        gap: 10px;
-        margin-top: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+        gap: 12px;
+        margin-top: 25px;
       }
+
       .card {
-        padding: 15px;
-        background: #eee;
-        border-radius: 8px;
+        padding: 20px 10px;
+        background: var(--card-bg);
+        backdrop-filter: blur(5px);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
         cursor: pointer;
         font-weight: bold;
-        transition: 0.3s;
+        color: var(--text-color);
+        transition:
+          transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+          background 0.3s;
       }
-      .card:hover {
-        background: #007bff;
+
+      /* 클릭 시 쫀득하게 눌리는 효과 */
+      .card:active {
+        transform: scale(0.85);
+        background: var(--accent-color);
         color: white;
       }
 
-      /* 문제 페이지 숨기기/보이기 */
+      .card:hover {
+        border-color: var(--accent-color);
+      }
+
       #quiz-page {
         display: none;
       }
-      .btn-back {
-        margin-top: 20px;
-        padding: 10px 20px;
-        cursor: pointer;
-        border: none;
-        border-radius: 5px;
-        background: #333;
-        color: white;
-      }
+
       .question-box {
-        font-size: 1.5rem;
-        margin: 30px 0;
-        color: #007bff;
-        /* 코드 상의 줄 바꿈을 화면에 그대로 보여주는 설정 */
+        font-size: 1.4rem;
+        line-height: 1.6;
+        margin: 40px 0;
+        color: var(--accent-color);
         white-space: pre-wrap;
+        word-break: keep-all;
+      }
+
+      .btn-back {
+        padding: 12px 30px;
+        border-radius: 50px;
+        border: none;
+        background: var(--text-color);
+        color: var(--bg-color);
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .btn-back:active {
+        transform: scale(0.9);
       }
     </style>
   </head>
   <body>
+    <!-- 테마 토글 버튼 -->
+    <button
+      class="theme-toggle"
+      onclick="toggleTheme()"
+      aria-label="고대비 모드 전환"
+    >
+      🌓
+    </button>
+
     <div class="container">
-      <!-- 메인 페이지: 숫자 카드 목록 -->
       <div id="main-page">
         <h1>번호를 골라주세요!</h1>
-        <div class="grid" id="card-grid">
-          <!-- 자바스크립트로 1~33번 카드가 생성됩니다 -->
-        </div>
+        <div class="grid" id="card-grid"></div>
       </div>
 
-      <!-- 퀴즈 페이지: 개별 문제 보기 -->
       <div id="quiz-page">
         <h1 id="quiz-title">0번 문제</h1>
-        <div class="question-box" id="question-text">
-          여기에 문제가 표시됩니다.
-        </div>
+        <div class="question-box" id="question-text"></div>
         <button class="btn-back" onclick="goBack()">뒤로 가기</button>
       </div>
     </div>
 
     <script>
-      // 1. 숫자 카드 1~33개 생성 (32에서 33으로 수정했습니다)
+      // 1. 숫자 카드 생성 (32개)
       const grid = document.getElementById('card-grid');
       for (let i = 1; i <= 32; i++) {
         const card = document.createElement('div');
@@ -103,33 +167,46 @@
       // 2. 퀴즈 데이터
       const quizData = {
         1: `모든 시각장애인은 전혀 보지 못한다. \n O/X`,
-        2: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n 
-            같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을주어야 하는데 \n 
-            시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
-        3: `차도와 인도가 나란히 있는 길에서 시각장애인과 동행하는 경우 \n
-            안내자는 시각장애인의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
-        4: `4번 문제의 예시입니다.`,
-        5: `5번 문제의 예시입니다.`,
-
-        30: '31번 문제의 예시입니다.',
-        31: '32번 문제의 예시입니다.',
+        2: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데 \n시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
+        3: `차도와 인도가 나란히 있는 길에서 시각장애인과 동행하는 경우 \n안내자는 시각장애인의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
         32: '마지막 문제입니다. 화이팅!',
       };
 
-      // 3. 문제 보여주기 함수
+      // 3. TTS 기능 (자동 읽어주기)
+      function speak(text) {
+        // 이전 음성 중지
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ko-KR';
+        utterance.rate = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+
+      // 4. 문제 보여주기 함수
       function showQuiz(num) {
+        const question = quizData[num] || '문제가 아직 등록되지 않았습니다.';
+
         document.getElementById('main-page').style.display = 'none';
         document.getElementById('quiz-page').style.display = 'block';
 
         document.getElementById('quiz-title').innerText = num + '번 문제';
-        document.getElementById('question-text').innerText =
-          quizData[num] || '문제가 아직 등록되지 않았습니다.';
+        document.getElementById('question-text').innerText = question;
+
+        // TTS 호출
+        const readText = `${num}번 문제입니다. ${question} 정답은 무엇일까요?`;
+        speak(readText);
       }
 
-      // 4. 메인으로 돌아가기
+      // 5. 메인으로 돌아가기
       function goBack() {
+        window.speechSynthesis.cancel(); // 음성 중지
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
+      }
+
+      // 6. 고대비 테마 토글
+      function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
       }
     </script>
   </body>
