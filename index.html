@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>33 숫자 퀴즈</title>
+    <!-- 파비콘 추가 (파일명이 favicon.png라면 아래와 같이 입력) -->
+    <link rel="icon" href="Logo-dssc.png" type="image/png" />
+    <title>32 숫자 퀴즈</title>
     <style>
       /* 깔끔한 디자인을 위한 스타일 */
       body {
@@ -62,6 +64,8 @@
         font-size: 1.5rem;
         margin: 30px 0;
         color: #007bff;
+        /* 코드 상의 줄 바꿈을 화면에 그대로 보여주는 설정 */
+        white-space: pre-wrap;
       }
     </style>
   </head>
@@ -86,7 +90,7 @@
     </div>
 
     <script>
-      // 1. 숫자 카드 1~33개 생성
+      // 1. 숫자 카드 1~33개 생성 (32에서 33으로 수정했습니다)
       const grid = document.getElementById('card-grid');
       for (let i = 1; i <= 32; i++) {
         const card = document.createElement('div');
@@ -96,7 +100,7 @@
         grid.appendChild(card);
       }
 
-      // 2. 퀴즈 데이터 (여기에 문제를 적으세요)
+      // 2. 퀴즈 데이터
       const quizData = {
         1: `모든 시각장애인은 전혀 보지 못한다. \n O/X`,
         2: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n 
@@ -107,9 +111,9 @@
         4: `4번 문제의 예시입니다.`,
         5: `5번 문제의 예시입니다.`,
 
-        31: '31번 문제의 예시입니다.',
+        30: '31번 문제의 예시입니다.',
+        31: '32번 문제의 예시입니다.',
         32: '마지막 문제입니다. 화이팅!',
-        // 필요한 번호의 문제를 계속 추가하세요. 없는 번호는 기본 문구가 뜹니다.
       };
 
       // 3. 문제 보여주기 함수
