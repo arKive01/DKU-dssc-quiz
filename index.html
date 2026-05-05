@@ -222,7 +222,7 @@
             // 문장이 끝나면 1초 대기 후 다음 문장으로
             utterance.onend = () => {
               if (i < parts.length - 1) {
-                setTimeout(resolve, 1000); // 1000ms = 1초 확실히 쉼
+                setTimeout(resolve, 550); // 1000ms = 1초 확실히 쉼
               } else {
                 resolve();
               }
