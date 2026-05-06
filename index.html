@@ -31,51 +31,25 @@
         color: var(--text-color);
         margin: 0;
         min-height: 100vh;
-        padding: env(safe-area-inset-top) 20px 120px 20px;
+        padding: env(safe-area-inset-top) 20px 140px 20px;
         transition: background 0.6s ease;
       }
       .container {
         max-width: 850px;
-        margin: 60px auto;
+        margin: 40px auto;
         background: var(--container-bg);
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
-        padding: 50px 20px;
+        padding: 40px 20px;
         border-radius: 40px;
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 25px 50px var(--glass-shadow);
       }
-      /* 테마 토글 애니메이션 */
-      .theme-toggle {
-        position: fixed;
-        top: 25px;
-        right: 25px;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: var(--glass-white);
-        border: 1px solid var(--glass-border);
-        cursor: pointer;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-      .theme-toggle:active {
-        transform: scale(0.8);
-      }
-      .theme-toggle svg {
-        transition: transform 0.5s ease;
-      }
-      .theme-toggle.active svg {
-        transform: rotate(360deg) scale(1.2);
-      }
 
       .grid {
         display: grid;
-        gap: 15px;
-        margin-top: 35px;
+        gap: 12px;
+        margin-top: 30px;
         grid-template-columns: repeat(8, 1fr);
       }
       @media (max-width: 768px) {
@@ -83,6 +57,7 @@
           grid-template-columns: repeat(5, 1fr);
         }
       }
+
       .card {
         aspect-ratio: 1 / 1;
         display: flex;
@@ -90,8 +65,8 @@
         justify-content: center;
         background: var(--glass-white);
         border: 1px solid var(--glass-border);
-        border-radius: 20px;
-        font-size: 1.3rem;
+        border-radius: 18px;
+        font-size: 1.2rem;
         font-weight: 800;
         cursor: pointer;
         box-shadow: 0 5px 15px var(--glass-shadow);
@@ -108,11 +83,20 @@
         pointer-events: auto !important;
       }
 
+      #question-text {
+        font-size: 1.5rem; /* 가독성을 위해 소폭 축소 */
+        margin: 30px 0;
+        font-weight: 800;
+        line-height: 1.6;
+        word-break: keep-all;
+        white-space: pre-line; /* 작성한 \n만 줄바꿈 적용 */
+      }
+
       #options-grid {
         display: flex;
-        gap: 15px;
+        gap: 12px;
         justify-content: center;
-        margin: 30px auto;
+        margin: 25px auto;
         width: 100%;
       }
       .layout-row {
@@ -121,13 +105,14 @@
       .layout-col {
         flex-direction: column;
       }
+
       .opt-btn {
-        padding: 20px;
+        padding: 18px;
         border-radius: 20px;
         border: 1px solid var(--glass-border);
         background: var(--glass-white);
         color: var(--text-color);
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         font-weight: 800;
         cursor: pointer;
         position: relative;
@@ -143,69 +128,88 @@
       }
       .opt-btn.is-ox {
         aspect-ratio: 1 / 1;
-        max-width: 150px;
-        font-size: 2.5rem;
+        max-width: 120px;
+        font-size: 2.2rem;
         flex: 1;
       }
 
-      .footer {
+      /* 푸터 다이나믹 아일랜드 스타일 */
+      .bottom-bar {
         position: fixed;
         bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 15px 30px;
+        gap: 10px;
+        z-index: 2000;
+      }
+      .footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
         background: var(--glass-white);
         backdrop-filter: blur(15px);
         border-radius: 50px;
         border: 1px solid var(--glass-border);
         text-decoration: none;
         color: var(--text-color);
+        white-space: nowrap;
       }
+      .footer span {
+        font-weight: 800;
+        font-size: 0.9rem;
+        letter-spacing: -0.5px;
+      }
+
+      .theme-toggle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--glass-white);
+        backdrop-filter: blur(15px);
+        border: 1px solid var(--glass-border);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .theme-toggle:active {
+        transform: scale(0.85);
+      }
+      .theme-toggle.active svg {
+        transform: rotate(360deg) scale(1.2);
+      }
+
       #quiz-page {
         display: none;
       }
     </style>
   </head>
   <body>
-    <button class="theme-toggle" onclick="handleThemeClick()" id="themeBtn">
-      <svg viewBox="0 0 24 24" width="28" fill="currentColor">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-    </button>
-
     <div class="container">
       <div id="main-page">
-        <h1 style="font-weight: 900; letter-spacing: -2px; font-size: 2.2rem">
+        <h1 style="font-weight: 900; letter-spacing: -1.5px; font-size: 1.8rem">
           뽑기에서 나온 번호에 맞는 숫자를 선택해주세요!
         </h1>
         <div class="grid" id="card-grid"></div>
       </div>
 
       <div id="quiz-page">
-        <h1 id="quiz-title" style="font-size: 1.1rem; opacity: 0.6"></h1>
-        <div
-          id="question-text"
-          style="
-            font-size: 1.8rem;
-            margin: 40px 0;
-            font-weight: 800;
-            line-height: 1.5;
-            word-break: keep-all;
-          "
-        ></div>
+        <h1 id="quiz-title" style="font-size: 1rem; opacity: 0.6"></h1>
+        <div id="question-text"></div>
         <div id="options-grid"></div>
         <div
           id="result-msg"
-          style="margin-top: 30px; font-size: 1.6rem; font-weight: 900"
+          style="margin-top: 25px; font-size: 1.5rem; font-weight: 900"
         ></div>
         <button
           onclick="goBack()"
           style="
-            margin-top: 50px;
-            padding: 16px 60px;
+            margin-top: 40px;
+            padding: 15px 50px;
             border-radius: 20px;
             border: none;
             background: var(--text-color);
@@ -219,11 +223,25 @@
       </div>
     </div>
 
-    <a href="https://www.instagram.com/dku_dssc" target="_blank" class="footer">
-      <span style="font-weight: 800; font-size: 1rem"
-        >단국대 장애학생지원센터</span
+    <div class="bottom-bar">
+      <a
+        href="https://www.instagram.com/dku_dssc"
+        target="_blank"
+        class="footer"
       >
-    </a>
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+          />
+        </svg>
+        <span>단국대 장애학생지원센터</span>
+      </a>
+      <button class="theme-toggle" onclick="handleThemeClick()" id="themeBtn">
+        <svg viewBox="0 0 24 24" width="24" fill="currentColor">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
 
     <script>
       let solveTime = null;
@@ -232,18 +250,23 @@
       const quizData = {
         1: {
           q: `모든 시각장애인은 전혀 보지 못한다.`,
-          opt: ['O', 'X'],
-          ans: 'X',
+          opt: [`O`, `X`],
+          ans: `X`,
         },
         2: {
-          q: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n 같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데 \n 시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
-          opt: ['정답은 운영진에게 말해주세요'],
-          ans: 'staff',
+          q: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다.\n같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데\n시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
+          opt: [`정답은 운영진에게 말해주세요`],
+          ans: `staff`,
+        },
+        3: {
+          q: `다음 중 안내견을 만났을 때의 에티켓으로\n옳지 않은 것은 무엇일까요?`,
+          opt: [`간식 주기`, `사진 찍지 않기`, `쓰다듬지 않기`, `부르지 않기`],
+          ans: `간식 주기`,
         },
         30: {
-          q: '관리자 모드: 초기화하시겠습니까?',
-          opt: ['리셋하기', '취소'],
-          ans: '리셋하기',
+          q: `관리자 모드: 초기화하시겠습니까?`,
+          opt: [`리셋하기`, `취소`],
+          ans: `리셋하기`,
         },
       };
 
@@ -276,7 +299,6 @@
 
       updateGrid();
 
-      // TTS 함수 복구
       async function speak(text) {
         window.speechSynthesis.cancel();
         const parts = text.split('\n');
@@ -295,12 +317,11 @@
       function showQuiz(num) {
         const data = quizData[num] || {
           q: `${num}번 준비 중!`,
-          opt: ['확인'],
-          ans: '확인',
+          opt: [`확인`],
+          ans: `확인`,
         };
         currentQuizType = data.ans;
 
-        // [수정] Staff 문제인 경우 진입 시점부터 타이머 시작 및 잠금 예약
         if (data.ans === 'staff') {
           solveTime = Date.now();
           localStorage.setItem('quiz_completed', 'true');
@@ -328,12 +349,10 @@
           optGrid.appendChild(btn);
         });
 
-        // TTS 호출
         speak(`${num}번 문제입니다. \n ${data.q}`);
       }
 
       function checkAnswer(num, userAns, correctAns) {
-        // 일반 문제는 여기서 잠금
         if (correctAns !== 'staff') {
           localStorage.setItem('quiz_completed', 'true');
         }
@@ -351,21 +370,15 @@
               "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
           }
         }
-
         document.getElementById('options-grid').style.pointerEvents = 'none';
       }
 
       function goBack() {
         window.speechSynthesis.cancel();
-
-        // [수정] Staff 타입 문제: 진입 후 10초 이내에 나가면 잠금 해제 (실수 인정)
         if (currentQuizType === 'staff' && solveTime !== null) {
-          const elapsed = Date.now() - solveTime;
-          if (elapsed < 10000) {
+          if (Date.now() - solveTime < 10000)
             localStorage.removeItem('quiz_completed');
-          }
         }
-
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
         document.getElementById('result-msg').innerHTML = '';
@@ -377,12 +390,12 @@
         const emojis = ['🎉', '🎊', '✨', '🎈', '⭐'];
         for (let i = 0; i < 40; i++) {
           const c = document.createElement('div');
-          c.className = 'confetti';
           c.style.position = 'fixed';
           c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
           c.style.left = Math.random() * 100 + 'vw';
           c.style.top = '-50px';
           c.style.fontSize = '40px';
+          c.style.zIndex = '3000';
           c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
           document.body.appendChild(c);
           setTimeout(() => {
@@ -402,9 +415,7 @@
         themeClicks++;
         if (themeClicks === 1) {
           document.body.classList.toggle('dark-mode');
-          setTimeout(() => {
-            themeClicks = 0;
-          }, 600);
+          setTimeout(() => (themeClicks = 0), 600);
         }
         if (themeClicks >= 3) {
           localStorage.removeItem('quiz_completed');
