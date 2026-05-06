@@ -94,13 +94,11 @@
         box-shadow: 0 5px 15px var(--glass-shadow);
         transition: transform 0.2s;
       }
-
       .card.locked {
         opacity: 0.2;
         filter: grayscale(1);
         pointer-events: none;
       }
-      /* 30번 카드 강제 활성화 */
       .card.admin-gate {
         opacity: 1 !important;
         filter: none !important;
@@ -249,16 +247,18 @@
     </a>
 
     <script>
+      let solveTime = null; // 문제를 푼 시각 저장
+
       const quizData = {
         1: {
-          q: '모든 시각장애인은 전혀 보지 못한다.',
+          q: `모든 시각장애인은 전혀 보지 못한다.`,
           opt: ['O', 'X'],
           ans: 'X',
         },
         2: {
-          q: '시각장애인 동기와 걸을 때, 어느 쪽에서 걸어야 할까요?',
-          opt: ['오른쪽', '왼쪽'],
-          ans: '왼쪽',
+          q: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n 같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데 \n 시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
+          opt: ['정답은 운영진에게 말해주세요'],
+          ans: '구두정답',
         },
         30: {
           q: '관리자 모드: 비밀의 문\n데이터를 초기화하시겠습니까?',
@@ -273,12 +273,10 @@
       for (let i = 1; i <= 30; i++) {
         const card = document.createElement('div');
         card.innerText = i;
-        // 30번 카드는 잠금 무시 클래스 부여
         card.className =
           'card' +
           (checkLock() ? ' locked' : '') +
           (i === 30 ? ' admin-gate' : '');
-
         card.onclick = () => {
           if (i === 30) {
             if (confirm('모든 퀴즈 참여 기록을 초기화할까요?')) {
@@ -292,7 +290,6 @@
         grid.appendChild(card);
       }
 
-      // 🔊 자연스러운 끊어읽기 TTS (0.55초 휴지기)
       async function speak(text) {
         window.speechSynthesis.cancel();
         const parts = text.split('\n');
@@ -302,7 +299,7 @@
             const utterance = new SpeechSynthesisUtterance(part);
             utterance.lang = 'ko-KR';
             utterance.rate = 1.0;
-            utterance.onend = () => setTimeout(resolve, 550); // 0.55초 대기
+            utterance.onend = () => setTimeout(resolve, 550);
             window.speechSynthesis.speak(utterance);
           });
         }
@@ -331,23 +328,33 @@
           else if (o === 'X') btn.classList.add('is-ox', 'btn-x');
           else if (data.opt.length <= 2) btn.style.flex = '1';
 
-          btn.onclick = () => checkAnswer(o, data.ans);
+          btn.onclick = () => checkAnswer(num, o, data.ans);
           optGrid.appendChild(btn);
         });
 
         speak(`${num}번 문제입니다. \n ${data.q} \n 정답은 무엇일까요.`);
       }
 
-      function checkAnswer(userAns, correctAns) {
+      function checkAnswer(num, userAns, correctAns) {
         localStorage.setItem('quiz_completed', 'true');
+        solveTime = Date.now(); // 푼 시간 기록
+
         const msg = document.getElementById('result-msg');
-        if (userAns === correctAns) {
-          msg.innerHTML = "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
-          fireConfetti();
+
+        // 2번 문제 (구두 정답) 전용 처리
+        if (correctAns === '구두정답') {
+          msg.innerHTML = ''; // 아무 메시지 안 띄움
         } else {
-          msg.innerHTML =
-            "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
+          if (userAns === correctAns) {
+            msg.innerHTML =
+              "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
+            fireConfetti();
+          } else {
+            msg.innerHTML =
+              "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
+          }
         }
+
         document.getElementById('options-grid').style.pointerEvents = 'none';
         document.querySelectorAll('.card').forEach((c) => {
           if (!c.classList.contains('admin-gate')) c.classList.add('locked');
@@ -375,8 +382,19 @@
 
       function goBack() {
         window.speechSynthesis.cancel();
+
+        // 🕒 10초 이내 뒤로가기 시 잠금 해제 로직
+        if (solveTime && Date.now() - solveTime < 10000) {
+          localStorage.removeItem('quiz_completed');
+          document.querySelectorAll('.card').forEach((c) => {
+            if (!c.classList.contains('admin-gate'))
+              c.classList.remove('locked');
+          });
+        }
+
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
+        solveTime = null; // 시간 초기화
       }
 
       let clicks = 0;
