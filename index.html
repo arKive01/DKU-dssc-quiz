@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="Logo-dssc.png" type="image/png" />
-    <title>32 숫자 퀴즈</title>
+    <title>퀴즈 Time!</title>
     <style>
       :root {
         --bg-main: linear-gradient(135deg, #e0f2ff 0%, #b3d9ff 100%);
@@ -202,7 +202,7 @@
     <div class="container">
       <div id="main-page">
         <h1 style="font-weight: 900; letter-spacing: -2px; font-size: 2.2rem">
-          번호를 골라주세요!
+          뽑기에서 나온 번호에 맞는 숫자를 선택해주세요!
         </h1>
         <div class="grid" id="card-grid"></div>
       </div>
@@ -335,7 +335,7 @@
           optGrid.appendChild(btn);
         });
 
-        speak(`${num}번 문제입니다. \n ${data.q} \n 정답을 골라주세요.`);
+        speak(`${num}번 문제입니다. \n ${data.q} \n 정답은 무엇일까요.`);
       }
 
       function checkAnswer(userAns, correctAns) {
@@ -346,7 +346,7 @@
           fireConfetti();
         } else {
           msg.innerHTML =
-            "<span style='color: #e74c3c;'>아쉽네요! 참여 완료</span>";
+            "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
         }
         document.getElementById('options-grid').style.pointerEvents = 'none';
         document.querySelectorAll('.card').forEach((c) => {
