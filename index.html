@@ -45,6 +45,7 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 25px 50px var(--glass-shadow);
       }
+      /* 테마 토글 애니메이션 추가 */
       .theme-toggle {
         position: fixed;
         top: 25px;
@@ -59,7 +60,18 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
+      .theme-toggle:active {
+        transform: scale(0.8);
+      }
+      .theme-toggle svg {
+        transition: transform 0.5s ease;
+      }
+      .theme-toggle.active svg {
+        transform: rotate(360deg) scale(1.2);
+      }
+
       .grid {
         display: grid;
         gap: 15px;
@@ -95,6 +107,7 @@
         filter: none !important;
         pointer-events: auto !important;
       }
+
       #options-grid {
         display: flex;
         gap: 15px;
@@ -134,9 +147,7 @@
         font-size: 2.5rem;
         flex: 1;
       }
-      .layout-col .opt-btn {
-        width: 100%;
-      }
+
       .footer {
         position: fixed;
         bottom: 30px;
@@ -152,11 +163,6 @@
         border: 1px solid var(--glass-border);
         text-decoration: none;
         color: var(--text-color);
-      }
-      .confetti {
-        position: fixed;
-        z-index: 2000;
-        pointer-events: none;
       }
       #quiz-page {
         display: none;
@@ -221,7 +227,7 @@
 
     <script>
       let solveTime = null;
-      let currentQuizAnsType = null;
+      let currentQuizType = null;
 
       const quizData = {
         1: {
@@ -235,7 +241,7 @@
           ans: 'staff',
         },
         30: {
-          q: '관리자 모드: 비밀의 문\n데이터를 초기화하시겠습니까?',
+          q: '관리자 모드: 초기화하시겠습니까?',
           opt: ['리셋하기', '취소'],
           ans: '리셋하기',
         },
@@ -256,7 +262,7 @@
             (i === 30 ? ' admin-gate' : '');
           card.onclick = () => {
             if (i === 30) {
-              if (confirm('모든 퀴즈 참여 기록을 초기화할까요?')) {
+              if (confirm('모든 기록을 리셋할까요?')) {
                 localStorage.removeItem('quiz_completed');
                 location.reload();
               }
@@ -270,29 +276,14 @@
 
       updateGrid();
 
-      async function speak(text) {
-        window.speechSynthesis.cancel();
-        const parts = text.split('\n');
-        for (const part of parts) {
-          if (!part.trim()) continue;
-          await new Promise((resolve) => {
-            const utterance = new SpeechSynthesisUtterance(part);
-            utterance.lang = 'ko-KR';
-            utterance.rate = 1.0;
-            utterance.onend = () => setTimeout(resolve, 550);
-            window.speechSynthesis.speak(utterance);
-          });
-        }
-      }
-
       function showQuiz(num) {
         const data = quizData[num] || {
           q: `${num}번 준비 중!`,
           opt: ['확인'],
           ans: '확인',
         };
-        currentQuizAnsType = data.ans;
-        solveTime = null;
+        currentQuizType = data.ans;
+        solveTime = null; // 초기화
 
         document.getElementById('main-page').style.display = 'none';
         document.getElementById('quiz-page').style.display = 'block';
@@ -310,80 +301,56 @@
           btn.innerText = o;
           if (o === 'O') btn.classList.add('is-ox', 'btn-o');
           else if (o === 'X') btn.classList.add('is-ox', 'btn-x');
-          btn.onclick = () => checkAnswer(o, data.ans);
+          btn.onclick = () => checkAnswer(num, o, data.ans);
           optGrid.appendChild(btn);
         });
-
-        speak(`${num}번 문제입니다. \n ${data.q} \n 정답은 무엇일까요.`);
       }
 
-      function checkAnswer(userAns, correctAns) {
-        // [핵심] 무조건 잠금 상태로 만듦
+      function checkAnswer(num, userAns, correctAns) {
+        // 일단 잠금 기록 저장
         localStorage.setItem('quiz_completed', 'true');
 
-        // 2번 같은 특이 문제만 '유예 시간' 기록
         if (correctAns === 'staff') {
-          solveTime = Date.now();
+          solveTime = Date.now(); // 2번 같은 특수 문제만 시간 기록
         }
 
         const msg = document.getElementById('result-msg');
         msg.innerHTML = '';
 
         if (correctAns !== 'staff') {
-          if (userAns === correctAns) {
+          if (userAns === correctAns)
             msg.innerHTML =
               "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
-            fireConfetti();
-          } else {
+          else
             msg.innerHTML =
               "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
-          }
         }
 
         document.getElementById('options-grid').style.pointerEvents = 'none';
-        updateGrid(); // 메인 그리드 즉시 잠금 반영
-      }
-
-      function fireConfetti() {
-        const emojis = ['🎉', '🎊', '✨', '🎈', '⭐'];
-        for (let i = 0; i < 55; i++) {
-          const c = document.createElement('div');
-          c.className = 'confetti';
-          c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-          c.style.left = Math.random() * 100 + 'vw';
-          c.style.top = '-80px';
-          c.style.fontSize = Math.random() * 30 + 45 + 'px';
-          c.style.transition = `all ${Math.random() * 2.5 + 3}s cubic-bezier(0.1, 0.5, 0.5, 1)`;
-          document.body.appendChild(c);
-          setTimeout(() => {
-            c.style.top = '120vh';
-            c.style.transform = `rotate(${Math.random() * 1000}deg) translateX(${Math.random() * 200 - 100}px)`;
-          }, 10);
-          setTimeout(() => c.remove(), 6000);
-        }
       }
 
       function goBack() {
-        window.speechSynthesis.cancel();
-
-        // staff 문제이면서 10초 이내라면 잠금 해제
-        if (
-          currentQuizAnsType === 'staff' &&
-          solveTime &&
-          Date.now() - solveTime < 10000
-        ) {
-          localStorage.removeItem('quiz_completed');
+        // [수정된 로직]
+        // Staff 타입 문제이면서, solveTime이 존재하고, 10초(10000ms)가 채 안 지났을 때만 잠금 해제
+        if (currentQuizType === 'staff' && solveTime !== null) {
+          const elapsed = Date.now() - solveTime;
+          if (elapsed < 10000) {
+            localStorage.removeItem('quiz_completed');
+          }
         }
 
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
-        document.getElementById('result-msg').innerHTML = '';
         solveTime = null;
-        updateGrid(); // 다시 그리기 (잠금 해제 여부 반영)
+        updateGrid(); // 목록으로 돌아올 때 그리드 상태 강제 업데이트
       }
 
       let themeClicks = 0;
       function handleThemeClick() {
+        const btn = document.getElementById('themeBtn');
+        btn.classList.add('active');
+        setTimeout(() => btn.classList.remove('active'), 500);
+
         themeClicks++;
         if (themeClicks === 1) {
           document.body.classList.toggle('dark-mode');
@@ -393,7 +360,7 @@
         }
         if (themeClicks >= 3) {
           localStorage.removeItem('quiz_completed');
-          alert('관리자 리셋 완료!');
+          alert('관리자 모드: 리셋되었습니다.');
           location.reload();
         }
       }
