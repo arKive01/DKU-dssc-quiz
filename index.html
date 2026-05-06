@@ -37,7 +37,7 @@
         background-color: var(--bg-color);
         color: var(--text-color);
         margin: 0;
-        padding: env(safe-area-inset-top) 20px;
+        padding: env(safe-area-inset-top) 20px 100px 20px; /* 하단 푸터 공간 확보 */
         transition:
           background-color 0.6s ease,
           color 0.6s ease;
@@ -45,7 +45,7 @@
 
       .container {
         max-width: 850px;
-        margin: 80px auto;
+        margin: 60px auto;
         background: var(--container-bg);
         backdrop-filter: blur(30px);
         -webkit-backdrop-filter: blur(30px);
@@ -55,48 +55,47 @@
         box-shadow: 0 20px 60px var(--card-shadow);
       }
 
-      /* 애플 스타일 원형 다크모드 버튼 */
+      /* 🌙 쫀득하게 구르는 테마 버튼 */
       .theme-toggle {
         position: fixed;
         top: 25px;
         right: 25px;
-        width: 64px;
-        height: 64px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         background: var(--toggle-bg);
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        border: none;
         cursor: pointer;
         z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
 
-      /* 깔끔한 단색 초승달 아이콘 */
       .theme-toggle svg {
         width: 26px;
         height: 26px;
         fill: var(--moon-color);
-        transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: transform 0.7s cubic-bezier(0.68, -0.6, 0.32, 1.6);
       }
 
-      .theme-toggle:active {
-        transform: scale(0.9);
+      .theme-toggle.rolling svg {
+        transform: rotate(360deg);
       }
 
-      /* 그리드 설정: PC 8*4 / Mobile 4*8 */
+      /* 📱 그리드: PC(8단) / 모바일(5단) */
       .grid {
         display: grid;
-        gap: 16px;
+        gap: 12px;
         margin-top: 30px;
         grid-template-columns: repeat(8, 1fr);
       }
 
       @media (max-width: 768px) {
         .grid {
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
         }
       }
 
@@ -108,17 +107,16 @@
         justify-content: center;
         background: var(--card-bg);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        font-size: 1.4rem;
+        border-radius: 16px;
+        font-size: 1.2rem;
         font-weight: 700;
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 12px var(--card-shadow);
-        transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 0 4px 10px var(--card-shadow);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      /* 상단 하이라이트 효과 */
       .card::before {
         content: '';
         position: absolute;
@@ -133,31 +131,68 @@
       }
 
       .card:active {
-        transform: scale(0.9) translateY(3px);
+        transform: scale(0.9);
+      }
+      .card.solved {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(1);
+      }
+
+      /* 🔘 퀴즈 옵션 버튼 (O/X, 객관식 공용) */
+      .options-container {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 30px;
+      }
+
+      .opt-btn {
+        padding: 15px 35px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 10px var(--card-shadow);
+        transition: all 0.2s;
+        min-width: 80px;
+      }
+
+      .opt-btn:hover {
         background: var(--accent-color);
         color: white;
       }
 
-      .question-box {
-        font-size: 1.65rem;
-        line-height: 1.8;
-        margin: 50px 0;
-        color: var(--accent-color);
-        white-space: pre-wrap;
-        word-break: keep-all;
-        font-weight: 600;
+      /* 📸 인스타그램 하단바 */
+      .footer {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 25px;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(15px);
+        border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        color: var(--text-color);
+        z-index: 999;
       }
 
-      .btn-back {
-        padding: 16px 55px;
-        border-radius: 20px;
-        border: none;
-        background: var(--text-color);
-        color: var(--bg-color);
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      /* 폭죽 애니메이션 입자 */
+      .confetti {
+        position: fixed;
+        width: 15px;
+        height: 15px;
+        z-index: 1001;
+        pointer-events: none;
       }
 
       #quiz-page {
@@ -166,7 +201,6 @@
     </style>
   </head>
   <body>
-    <!-- 초승달 버튼 -->
     <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
       <svg viewBox="0 0 24 24">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -175,72 +209,157 @@
 
     <div class="container">
       <div id="main-page">
-        <h1 style="font-weight: 800; letter-spacing: -2px; margin-bottom: 40px">
+        <h1 style="font-weight: 800; letter-spacing: -1.5px">
           번호를 골라주세요!
         </h1>
         <div class="grid" id="card-grid"></div>
       </div>
 
       <div id="quiz-page">
-        <h1 id="quiz-title" style="font-size: 1rem; opacity: 0.5">0번 문제</h1>
-        <div id="question-text" class="question-box"></div>
-        <button class="btn-back" onclick="goBack()">뒤로 가기</button>
+        <h1 id="quiz-title" style="font-size: 1rem; opacity: 0.5"></h1>
+        <div
+          id="question-text"
+          class="question-box"
+          style="font-size: 1.5rem; margin: 40px 0; font-weight: 600"
+        ></div>
+        <div id="options-grid" class="options-container"></div>
+        <div id="result-msg" style="margin-top: 20px; font-weight: bold"></div>
+        <button
+          class="btn-back"
+          onclick="goBack()"
+          style="
+            margin-top: 30px;
+            padding: 12px 40px;
+            border-radius: 15px;
+            border: none;
+            background: var(--text-color);
+            color: var(--bg-color);
+            cursor: pointer;
+          "
+        >
+          뒤로 가기
+        </button>
       </div>
     </div>
 
+    <!-- 푸터 인스타그램 -->
+    <a href="https://www.instagram.com/dku_dssc" target="_blank" class="footer">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+        />
+      </svg>
+      <span style="font-weight: 600; font-size: 0.9rem"
+        >단국대 장애학생지원센터</span
+      >
+    </a>
+
     <script>
+      // 퀴즈 데이터 및 정답 설정 (1-30문항)
+      const quizData = {
+        1: {
+          q: '모든 시각장애인은 전혀 보지 못한다.',
+          opt: ['O', 'X'],
+          ans: 'X',
+        },
+        2: {
+          q: '시각장애인 동기와 걸을 때, 어느 쪽에서 걸어야 할까요?',
+          opt: ['오른쪽', '왼쪽'],
+          ans: '왼쪽',
+        },
+        3: {
+          q: '안내자는 차도와 인도 중 어디에 서야 할까요?',
+          opt: ['차도 쪽', '인도 쪽'],
+          ans: '차도 쪽',
+        },
+      };
+
+      // 30문항 생성 루프
       const grid = document.getElementById('card-grid');
-      for (let i = 1; i <= 32; i++) {
+      for (let i = 1; i <= 30; i++) {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerText = i;
-        card.onclick = () => showQuiz(i);
+        if (localStorage.getItem(`quiz_${i}`)) card.classList.add('solved');
+        card.onclick = () => !localStorage.getItem(`quiz_${i}`) && showQuiz(i);
         grid.appendChild(card);
       }
 
-      const quizData = {
-        1: `모든 시각장애인은 전혀 보지 못한다. \n O/X`,
-        2: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데 \n시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
-        3: `차도와 인도가 나란히 있는 길에서 시각장애인과 동행하는 경우 \n안내자는 시각장애인의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
-      };
-
-      // 1초 확실하게 쉬는 TTS 함수 (Queue 방식)
       async function speak(text) {
         window.speechSynthesis.cancel();
-
-        // 문장을 줄바꿈 기준으로 쪼개기
         const parts = text.split('\n');
-
-        for (let i = 0; i < parts.length; i++) {
-          if (parts[i].trim().length === 0) continue;
-
-          await new Promise((resolve) => {
-            const utterance = new SpeechSynthesisUtterance(parts[i]);
-            utterance.lang = 'ko-KR';
-            utterance.rate = 1.0;
-
-            // 문장이 끝나면 1초 대기 후 다음 문장으로
-            utterance.onend = () => {
-              if (i < parts.length - 1) {
-                setTimeout(resolve, 550); // 1000ms = 1초 확실히 쉼
-              } else {
-                resolve();
-              }
-            };
-            window.speechSynthesis.speak(utterance);
+        for (const part of parts) {
+          if (!part.trim()) continue;
+          await new Promise((r) => {
+            const u = new SpeechSynthesisUtterance(part);
+            u.lang = 'ko-KR';
+            u.onend = () => setTimeout(r, 1000);
+            window.speechSynthesis.speak(u);
           });
         }
       }
 
       function showQuiz(num) {
-        const question = quizData[num] || '문제가 아직 등록되지 않았습니다.';
+        const data = quizData[num] || {
+          q: `${num}번 문제가 준비 중입니다.`,
+          opt: ['확인'],
+          ans: '확인',
+        };
         document.getElementById('main-page').style.display = 'none';
         document.getElementById('quiz-page').style.display = 'block';
-        document.getElementById('quiz-title').innerText = num + '번 문제';
-        document.getElementById('question-text').innerText = question;
+        document.getElementById('quiz-title').innerText = `${num}번 문제`;
+        document.getElementById('question-text').innerText = data.q;
 
-        const fullText = `${num}번 문제입니다. \n ${question} \n 정답은 무엇일까요?`;
-        speak(fullText);
+        const optGrid = document.getElementById('options-grid');
+        optGrid.innerHTML = '';
+        document.getElementById('result-msg').innerText = '';
+
+        data.opt.forEach((o) => {
+          const btn = document.createElement('button');
+          btn.className = 'opt-btn';
+          btn.innerText = o;
+          btn.onclick = () => checkAnswer(num, o, data.ans);
+          optGrid.appendChild(btn);
+        });
+
+        speak(`${num}번 문제입니다. \n ${data.q} \n 정답을 골라주세요.`);
+      }
+
+      function checkAnswer(num, userAns, correctAns) {
+        localStorage.setItem(`quiz_${num}`, userAns); // 정답 여부 상관없이 1회 참여 기록
+        const msg = document.getElementById('result-msg');
+
+        if (userAns === correctAns) {
+          msg.innerHTML = "<span style='color: #4cd964;'>정답입니다! 🎉</span>";
+          fireConfetti();
+        } else {
+          msg.innerHTML =
+            "<span style='color: #ff3b30;'>틀렸습니다! (참여 완료)</span>";
+        }
+
+        document.getElementById('options-grid').style.pointerEvents = 'none';
+        document.querySelectorAll('.card')[num - 1].classList.add('solved');
+      }
+
+      // 🎉 폭죽 파티클 (Apple 이모티콘 스타일)
+      function fireConfetti() {
+        const emojis = ['🎉', '🎊', '✨', '🎈'];
+        for (let i = 0; i < 30; i++) {
+          const c = document.createElement('div');
+          c.className = 'confetti';
+          c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+          c.style.left = Math.random() * 100 + 'vw';
+          c.style.top = '-50px';
+          c.style.fontSize = Math.random() * 20 + 20 + 'px';
+          c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
+          document.body.appendChild(c);
+
+          setTimeout(() => {
+            c.style.top = '110vh';
+            c.style.transform = `rotate(${Math.random() * 360}deg) translateX(${Math.random() * 100 - 50}px)`;
+          }, 10);
+          setTimeout(() => c.remove(), 4000);
+        }
       }
 
       function goBack() {
@@ -250,13 +369,10 @@
       }
 
       function toggleTheme() {
+        const btn = document.getElementById('themeBtn');
+        btn.classList.add('rolling');
         document.body.classList.toggle('dark-mode');
-        const icon = document.querySelector('.theme-toggle svg');
-        if (document.body.classList.contains('dark-mode')) {
-          icon.style.transform = 'rotate(-160deg) scale(1.1)';
-        } else {
-          icon.style.transform = 'rotate(0deg) scale(1)';
-        }
+        setTimeout(() => btn.classList.remove('rolling'), 700);
       }
     </script>
   </body>
