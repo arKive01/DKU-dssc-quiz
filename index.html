@@ -45,7 +45,7 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 25px 50px var(--glass-shadow);
       }
-      /* 테마 토글 애니메이션 추가 */
+      /* 테마 토글 애니메이션 */
       .theme-toggle {
         position: fixed;
         top: 25px;
@@ -276,6 +276,22 @@
 
       updateGrid();
 
+      // TTS 함수 복구
+      async function speak(text) {
+        window.speechSynthesis.cancel();
+        const parts = text.split('\n');
+        for (const part of parts) {
+          if (!part.trim()) continue;
+          await new Promise((resolve) => {
+            const utterance = new SpeechSynthesisUtterance(part);
+            utterance.lang = 'ko-KR';
+            utterance.rate = 1.0;
+            utterance.onend = () => setTimeout(resolve, 550);
+            window.speechSynthesis.speak(utterance);
+          });
+        }
+      }
+
       function showQuiz(num) {
         const data = quizData[num] || {
           q: `${num}번 준비 중!`,
@@ -283,7 +299,14 @@
           ans: '확인',
         };
         currentQuizType = data.ans;
-        solveTime = null; // 초기화
+
+        // [수정] Staff 문제인 경우 진입 시점부터 타이머 시작 및 잠금 예약
+        if (data.ans === 'staff') {
+          solveTime = Date.now();
+          localStorage.setItem('quiz_completed', 'true');
+        } else {
+          solveTime = null;
+        }
 
         document.getElementById('main-page').style.display = 'none';
         document.getElementById('quiz-page').style.display = 'block';
@@ -304,34 +327,38 @@
           btn.onclick = () => checkAnswer(num, o, data.ans);
           optGrid.appendChild(btn);
         });
+
+        // TTS 호출
+        speak(`${num}번 문제입니다. \n ${data.q}`);
       }
 
       function checkAnswer(num, userAns, correctAns) {
-        // 일단 잠금 기록 저장
-        localStorage.setItem('quiz_completed', 'true');
-
-        if (correctAns === 'staff') {
-          solveTime = Date.now(); // 2번 같은 특수 문제만 시간 기록
+        // 일반 문제는 여기서 잠금
+        if (correctAns !== 'staff') {
+          localStorage.setItem('quiz_completed', 'true');
         }
 
         const msg = document.getElementById('result-msg');
         msg.innerHTML = '';
 
         if (correctAns !== 'staff') {
-          if (userAns === correctAns)
+          if (userAns === correctAns) {
             msg.innerHTML =
               "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
-          else
+            fireConfetti();
+          } else {
             msg.innerHTML =
               "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
+          }
         }
 
         document.getElementById('options-grid').style.pointerEvents = 'none';
       }
 
       function goBack() {
-        // [수정된 로직]
-        // Staff 타입 문제이면서, solveTime이 존재하고, 10초(10000ms)가 채 안 지났을 때만 잠금 해제
+        window.speechSynthesis.cancel();
+
+        // [수정] Staff 타입 문제: 진입 후 10초 이내에 나가면 잠금 해제 (실수 인정)
         if (currentQuizType === 'staff' && solveTime !== null) {
           const elapsed = Date.now() - solveTime;
           if (elapsed < 10000) {
@@ -341,8 +368,29 @@
 
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
+        document.getElementById('result-msg').innerHTML = '';
         solveTime = null;
-        updateGrid(); // 목록으로 돌아올 때 그리드 상태 강제 업데이트
+        updateGrid();
+      }
+
+      function fireConfetti() {
+        const emojis = ['🎉', '🎊', '✨', '🎈', '⭐'];
+        for (let i = 0; i < 40; i++) {
+          const c = document.createElement('div');
+          c.className = 'confetti';
+          c.style.position = 'fixed';
+          c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+          c.style.left = Math.random() * 100 + 'vw';
+          c.style.top = '-50px';
+          c.style.fontSize = '40px';
+          c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
+          document.body.appendChild(c);
+          setTimeout(() => {
+            c.style.top = '110vh';
+            c.style.transform = `rotate(${Math.random() * 360}deg)`;
+          }, 50);
+          setTimeout(() => c.remove(), 4000);
+        }
       }
 
       let themeClicks = 0;
