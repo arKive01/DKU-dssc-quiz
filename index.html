@@ -16,7 +16,6 @@
         --glass-green: rgba(52, 199, 89, 0.85);
         --glass-red: rgba(255, 59, 48, 0.85);
       }
-
       body.dark-mode {
         --bg-main: linear-gradient(135deg, #1a1a1a 0%, #001f3f 100%);
         --container-bg: rgba(0, 0, 0, 0.5);
@@ -24,12 +23,8 @@
         --glass-white: rgba(255, 255, 255, 0.15);
         --glass-border: rgba(255, 255, 255, 0.1);
       }
-
       body {
-        font-family:
-          'Pretendard',
-          -apple-system,
-          sans-serif;
+        font-family: 'Pretendard', sans-serif;
         text-align: center;
         background: var(--bg-main);
         background-attachment: fixed;
@@ -39,7 +34,6 @@
         padding: env(safe-area-inset-top) 20px 120px 20px;
         transition: background 0.6s ease;
       }
-
       .container {
         max-width: 850px;
         margin: 60px auto;
@@ -51,7 +45,6 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 25px 50px var(--glass-shadow);
       }
-
       .theme-toggle {
         position: fixed;
         top: 25px;
@@ -67,7 +60,6 @@
         align-items: center;
         justify-content: center;
       }
-
       .grid {
         display: grid;
         gap: 15px;
@@ -79,7 +71,6 @@
           grid-template-columns: repeat(5, 1fr);
         }
       }
-
       .card {
         aspect-ratio: 1 / 1;
         display: flex;
@@ -99,13 +90,11 @@
         filter: grayscale(1);
         pointer-events: none;
       }
-      /* 관리자 초기화용 30번 항상 활성화 */
       .card.admin-gate {
         opacity: 1 !important;
         filter: none !important;
         pointer-events: auto !important;
       }
-
       #options-grid {
         display: flex;
         gap: 15px;
@@ -119,7 +108,6 @@
       .layout-col {
         flex-direction: column;
       }
-
       .opt-btn {
         padding: 20px;
         border-radius: 20px;
@@ -149,21 +137,6 @@
       .layout-col .opt-btn {
         width: 100%;
       }
-
-      .opt-btn::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 50%;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.3) 0%,
-          rgba(255, 255, 255, 0) 100%
-        );
-      }
-
       .footer {
         position: fixed;
         bottom: 30px;
@@ -180,7 +153,6 @@
         text-decoration: none;
         color: var(--text-color);
       }
-
       .confetti {
         position: fixed;
         z-index: 2000;
@@ -248,7 +220,8 @@
     </a>
 
     <script>
-      let solveTime = null; // 뒤로가기 유예 시간용
+      let solveTime = null;
+      let currentQuizAnsType = null;
 
       const quizData = {
         1: {
@@ -259,9 +232,8 @@
         2: {
           q: `시각장애인 동기와 점심을 먹으러 학생식당으로 이동합니다. \n 같이 걸어갈 때 팔을 잡고 걸을 수 있도록 도움을 주어야 하는데 \n 시각장애인 동기의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
           opt: ['정답은 운영진에게 말해주세요'],
-          ans: 'staff', // 'staff'로 설정하면 정답 문구가 뜨지 않음
+          ans: 'staff',
         },
-        // 동일한 형태의 문제가 더 필요하면 ans: 'staff' 로 추가하시면 됩니다.
         30: {
           q: '관리자 모드: 비밀의 문\n데이터를 초기화하시겠습니까?',
           opt: ['리셋하기', '취소'],
@@ -271,19 +243,17 @@
 
       const checkLock = () => localStorage.getItem('quiz_completed') === 'true';
 
-      // 메인 페이지 카드 생성
-      const updateGrid = () => {
+      function updateGrid() {
         const grid = document.getElementById('card-grid');
         grid.innerHTML = '';
+        const isLocked = checkLock();
         for (let i = 1; i <= 30; i++) {
           const card = document.createElement('div');
           card.innerText = i;
-          const isLocked = checkLock();
           card.className =
             'card' +
             (isLocked ? ' locked' : '') +
             (i === 30 ? ' admin-gate' : '');
-
           card.onclick = () => {
             if (i === 30) {
               if (confirm('모든 퀴즈 참여 기록을 초기화할까요?')) {
@@ -296,7 +266,7 @@
           };
           grid.appendChild(card);
         }
-      };
+      }
 
       updateGrid();
 
@@ -321,6 +291,9 @@
           opt: ['확인'],
           ans: '확인',
         };
+        currentQuizAnsType = data.ans;
+        solveTime = null;
+
         document.getElementById('main-page').style.display = 'none';
         document.getElementById('quiz-page').style.display = 'block';
         document.getElementById('quiz-title').innerText = `${num}번 문제`;
@@ -328,7 +301,7 @@
 
         const optGrid = document.getElementById('options-grid');
         optGrid.innerHTML = '';
-        optGrid.style.pointerEvents = 'auto'; // 잠금 해제
+        optGrid.style.pointerEvents = 'auto';
         optGrid.className = data.opt.length <= 2 ? 'layout-row' : 'layout-col';
 
         data.opt.forEach((o) => {
@@ -337,24 +310,25 @@
           btn.innerText = o;
           if (o === 'O') btn.classList.add('is-ox', 'btn-o');
           else if (o === 'X') btn.classList.add('is-ox', 'btn-x');
-          else if (data.opt.length <= 2) btn.style.flex = '1';
-
-          btn.onclick = () => checkAnswer(num, o, data.ans);
+          btn.onclick = () => checkAnswer(o, data.ans);
           optGrid.appendChild(btn);
         });
 
         speak(`${num}번 문제입니다. \n ${data.q} \n 정답은 무엇일까요.`);
       }
 
-      function checkAnswer(num, userAns, correctAns) {
-        // 즉시 잠금 기록
+      function checkAnswer(userAns, correctAns) {
+        // [핵심] 무조건 잠금 상태로 만듦
         localStorage.setItem('quiz_completed', 'true');
-        solveTime = Date.now();
+
+        // 2번 같은 특이 문제만 '유예 시간' 기록
+        if (correctAns === 'staff') {
+          solveTime = Date.now();
+        }
 
         const msg = document.getElementById('result-msg');
-        msg.innerHTML = ''; // 초기화
+        msg.innerHTML = '';
 
-        // 'staff' 타입인 경우 아무런 피드백을 주지 않음 (운영진 대면용)
         if (correctAns !== 'staff') {
           if (userAns === correctAns) {
             msg.innerHTML =
@@ -366,9 +340,8 @@
           }
         }
 
-        // 옵션 클릭 막기 및 메인 카드 잠금 시각화
         document.getElementById('options-grid').style.pointerEvents = 'none';
-        updateGrid();
+        updateGrid(); // 메인 그리드 즉시 잠금 반영
       }
 
       function fireConfetti() {
@@ -393,8 +366,12 @@
       function goBack() {
         window.speechSynthesis.cancel();
 
-        // 🕒 10초 이내 뒤로가기 클릭 시 "실수"로 간주하고 잠금 해제
-        if (solveTime && Date.now() - solveTime < 10000) {
+        // staff 문제이면서 10초 이내라면 잠금 해제
+        if (
+          currentQuizAnsType === 'staff' &&
+          solveTime &&
+          Date.now() - solveTime < 10000
+        ) {
           localStorage.removeItem('quiz_completed');
         }
 
@@ -402,19 +379,19 @@
         document.getElementById('quiz-page').style.display = 'none';
         document.getElementById('result-msg').innerHTML = '';
         solveTime = null;
-        updateGrid(); // 그리드 상태 동기화
+        updateGrid(); // 다시 그리기 (잠금 해제 여부 반영)
       }
 
-      let clicks = 0;
+      let themeClicks = 0;
       function handleThemeClick() {
-        clicks++;
-        if (clicks === 1) {
+        themeClicks++;
+        if (themeClicks === 1) {
           document.body.classList.toggle('dark-mode');
           setTimeout(() => {
-            clicks = 0;
+            themeClicks = 0;
           }, 600);
         }
-        if (clicks >= 3) {
+        if (themeClicks >= 3) {
           localStorage.removeItem('quiz_completed');
           alert('관리자 리셋 완료!');
           location.reload();
