@@ -37,10 +37,9 @@
         background-color: var(--bg-color);
         color: var(--text-color);
         margin: 0;
-        padding: env(safe-area-inset-top) 20px 100px 20px; /* 하단 푸터 공간 확보 */
-        transition:
-          background-color 0.6s ease,
-          color 0.6s ease;
+        padding: env(safe-area-inset-top) 20px 120px 20px;
+        transition: background-color 0.6s ease;
+        overflow-x: hidden;
       }
 
       .container {
@@ -55,7 +54,7 @@
         box-shadow: 0 20px 60px var(--card-shadow);
       }
 
-      /* 🌙 쫀득하게 구르는 테마 버튼 */
+      /* 🌙 쫀득한 한 바퀴 회전 테마 버튼 */
       .theme-toggle {
         position: fixed;
         top: 25px;
@@ -71,21 +70,20 @@
         align-items: center;
         justify-content: center;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
 
       .theme-toggle svg {
         width: 26px;
         height: 26px;
         fill: var(--moon-color);
-        transition: transform 0.7s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
 
       .theme-toggle.rolling svg {
         transform: rotate(360deg);
       }
 
-      /* 📱 그리드: PC(8단) / 모바일(5단) */
+      /* 📱 모바일 5단 그리드 */
       .grid {
         display: grid;
         gap: 12px;
@@ -99,7 +97,6 @@
         }
       }
 
-      /* 리퀴드 글래스 버튼 */
       .card {
         aspect-ratio: 1 / 1;
         display: flex;
@@ -111,41 +108,20 @@
         font-size: 1.2rem;
         font-weight: 700;
         cursor: pointer;
-        position: relative;
-        overflow: hidden;
         box-shadow: 0 4px 10px var(--card-shadow);
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s ease;
       }
 
-      .card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 50%;
-        background: linear-gradient(
-          rgba(255, 255, 255, 0.3),
-          rgba(255, 255, 255, 0)
-        );
-      }
-
-      .card:active {
-        transform: scale(0.9);
-      }
-      .card.solved {
-        opacity: 0.5;
+      /* 한 문제 풀면 모든 카드 잠금 스타일 */
+      .card.locked {
+        opacity: 0.4;
         cursor: not-allowed;
         filter: grayscale(1);
+        pointer-events: none;
       }
 
-      /* 🔘 퀴즈 옵션 버튼 (O/X, 객관식 공용) */
-      .options-container {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-top: 30px;
+      .card:active:not(.locked) {
+        transform: scale(0.9);
       }
 
       .opt-btn {
@@ -156,9 +132,8 @@
         color: var(--text-color);
         font-weight: bold;
         cursor: pointer;
-        box-shadow: 0 4px 10px var(--card-shadow);
+        margin: 5px;
         transition: all 0.2s;
-        min-width: 80px;
       }
 
       .opt-btn:hover {
@@ -166,10 +141,10 @@
         color: white;
       }
 
-      /* 📸 인스타그램 하단바 */
+      /* 하단 인스타그램 바 */
       .footer {
         position: fixed;
-        bottom: 20px;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
@@ -181,17 +156,16 @@
         border-radius: 50px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        text-decoration: none;
-        color: var(--text-color);
+        cursor: pointer;
         z-index: 999;
+        user-select: none;
       }
 
-      /* 폭죽 애니메이션 입자 */
       .confetti {
         position: fixed;
-        width: 15px;
-        height: 15px;
-        z-index: 1001;
+        width: 20px;
+        height: 20px;
+        z-index: 2000;
         pointer-events: none;
       }
 
@@ -219,43 +193,48 @@
         <h1 id="quiz-title" style="font-size: 1rem; opacity: 0.5"></h1>
         <div
           id="question-text"
-          class="question-box"
-          style="font-size: 1.5rem; margin: 40px 0; font-weight: 600"
+          style="
+            font-size: 1.5rem;
+            margin: 40px 0;
+            font-weight: 600;
+            line-height: 1.6;
+          "
         ></div>
-        <div id="options-grid" class="options-container"></div>
-        <div id="result-msg" style="margin-top: 20px; font-weight: bold"></div>
+        <div id="options-grid"></div>
+        <div
+          id="result-msg"
+          style="margin-top: 25px; font-size: 1.2rem; font-weight: bold"
+        ></div>
         <button
-          class="btn-back"
           onclick="goBack()"
           style="
-            margin-top: 30px;
-            padding: 12px 40px;
+            margin-top: 40px;
+            padding: 12px 50px;
             border-radius: 15px;
             border: none;
             background: var(--text-color);
             color: var(--bg-color);
+            font-weight: bold;
             cursor: pointer;
           "
         >
-          뒤로 가기
+          목록으로
         </button>
       </div>
     </div>
 
-    <!-- 푸터 인스타그램 -->
-    <a href="https://www.instagram.com/dku_dssc" target="_blank" class="footer">
+    <div class="footer" onclick="adminReset()">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
         <path
-          d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+          d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
         />
       </svg>
-      <span style="font-weight: 600; font-size: 0.9rem"
+      <span id="admin-text" style="font-weight: 600; font-size: 0.9rem"
         >단국대 장애학생지원센터</span
       >
-    </a>
+    </div>
 
     <script>
-      // 퀴즈 데이터 및 정답 설정 (1-30문항)
       const quizData = {
         1: {
           q: '모든 시각장애인은 전혀 보지 못한다.',
@@ -274,14 +253,15 @@
         },
       };
 
-      // 30문항 생성 루프
+      // 초기화 상태 체크
+      const checkLock = () => localStorage.getItem('quiz_completed') === 'true';
+
       const grid = document.getElementById('card-grid');
       for (let i = 1; i <= 30; i++) {
         const card = document.createElement('div');
-        card.className = 'card';
+        card.className = 'card' + (checkLock() ? ' locked' : '');
         card.innerText = i;
-        if (localStorage.getItem(`quiz_${i}`)) card.classList.add('solved');
-        card.onclick = () => !localStorage.getItem(`quiz_${i}`) && showQuiz(i);
+        card.onclick = () => !checkLock() && showQuiz(i);
         grid.appendChild(card);
       }
 
@@ -301,7 +281,7 @@
 
       function showQuiz(num) {
         const data = quizData[num] || {
-          q: `${num}번 문제가 준비 중입니다.`,
+          q: `${num}번 준비 중!`,
           opt: ['확인'],
           ans: '확인',
         };
@@ -326,7 +306,7 @@
       }
 
       function checkAnswer(num, userAns, correctAns) {
-        localStorage.setItem(`quiz_${num}`, userAns); // 정답 여부 상관없이 1회 참여 기록
+        localStorage.setItem('quiz_completed', 'true'); // 단 한 번이라도 풀면 전체 잠금
         const msg = document.getElementById('result-msg');
 
         if (userAns === correctAns) {
@@ -334,14 +314,16 @@
           fireConfetti();
         } else {
           msg.innerHTML =
-            "<span style='color: #ff3b30;'>틀렸습니다! (참여 완료)</span>";
+            "<span style='color: #ff3b30;'>틀렸습니다! 참여가 완료되었습니다.</span>";
         }
 
         document.getElementById('options-grid').style.pointerEvents = 'none';
-        document.querySelectorAll('.card')[num - 1].classList.add('solved');
+        // 메인 화면 카드들 즉시 잠금
+        document
+          .querySelectorAll('.card')
+          .forEach((c) => c.classList.add('locked'));
       }
 
-      // 🎉 폭죽 파티클 (Apple 이모티콘 스타일)
       function fireConfetti() {
         const emojis = ['🎉', '🎊', '✨', '🎈'];
         for (let i = 0; i < 30; i++) {
@@ -353,10 +335,9 @@
           c.style.fontSize = Math.random() * 20 + 20 + 'px';
           c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
           document.body.appendChild(c);
-
           setTimeout(() => {
             c.style.top = '110vh';
-            c.style.transform = `rotate(${Math.random() * 360}deg) translateX(${Math.random() * 100 - 50}px)`;
+            c.style.transform = `rotate(${Math.random() * 360}deg)`;
           }, 10);
           setTimeout(() => c.remove(), 4000);
         }
@@ -372,7 +353,19 @@
         const btn = document.getElementById('themeBtn');
         btn.classList.add('rolling');
         document.body.classList.toggle('dark-mode');
-        setTimeout(() => btn.classList.remove('rolling'), 700);
+        setTimeout(() => btn.classList.remove('rolling'), 600);
+      }
+
+      // 🤫 관리자 리셋 기능 (인스타그램 문구 3번 클릭)
+      let clickCount = 0;
+      function adminReset() {
+        clickCount++;
+        if (clickCount >= 3) {
+          localStorage.removeItem('quiz_completed');
+          alert('관리자 모드: 퀴즈 잠금이 해제되었습니다.');
+          location.reload();
+        }
+        setTimeout(() => (clickCount = 0), 2000); // 2초 내에 3번 클릭해야 함
       }
     </script>
   </body>
