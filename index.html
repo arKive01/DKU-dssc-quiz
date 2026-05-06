@@ -13,10 +13,8 @@
         --glass-white: rgba(255, 255, 255, 0.7);
         --glass-border: rgba(255, 255, 255, 0.5);
         --glass-shadow: rgba(0, 0, 0, 0.05);
-
-        /* O/X 리퀴드 컬러 */
-        --glass-green: rgba(52, 199, 89, 0.8);
-        --glass-red: rgba(255, 59, 48, 0.8);
+        --glass-green: rgba(52, 199, 89, 0.85);
+        --glass-red: rgba(255, 59, 48, 0.85);
       }
 
       body.dark-mode {
@@ -76,7 +74,6 @@
         margin-top: 35px;
         grid-template-columns: repeat(8, 1fr);
       }
-
       @media (max-width: 768px) {
         .grid {
           grid-template-columns: repeat(5, 1fr);
@@ -103,6 +100,12 @@
         filter: grayscale(1);
         pointer-events: none;
       }
+      /* 30번 카드 강제 활성화 */
+      .card.admin-gate {
+        opacity: 1 !important;
+        filter: none !important;
+        pointer-events: auto !important;
+      }
 
       #options-grid {
         display: flex;
@@ -111,7 +114,6 @@
         margin: 30px auto;
         width: 100%;
       }
-
       .layout-row {
         flex-direction: row;
       }
@@ -130,10 +132,7 @@
         cursor: pointer;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 8px 20px var(--glass-shadow);
       }
-
-      /* 🎨 O/X 리퀴드 컬러 적용 */
       .opt-btn.btn-o {
         background: var(--glass-green);
         color: white;
@@ -142,7 +141,6 @@
         background: var(--glass-red);
         color: white;
       }
-
       .opt-btn.is-ox {
         aspect-ratio: 1 / 1;
         max-width: 150px;
@@ -218,6 +216,7 @@
             margin: 40px 0;
             font-weight: 800;
             line-height: 1.5;
+            word-break: keep-all;
           "
         ></div>
         <div id="options-grid"></div>
@@ -262,9 +261,9 @@
           ans: '왼쪽',
         },
         30: {
-          q: '임시 초기화 카드입니다. 클릭 시 리셋됩니다.',
-          opt: ['테스트'],
-          ans: '테스트',
+          q: '관리자 모드: 비밀의 문\n데이터를 초기화하시겠습니까?',
+          opt: ['리셋하기', '취소'],
+          ans: '리셋하기',
         },
       };
 
@@ -273,19 +272,40 @@
       const grid = document.getElementById('card-grid');
       for (let i = 1; i <= 30; i++) {
         const card = document.createElement('div');
-        card.className = 'card' + (checkLock() ? ' locked' : '');
         card.innerText = i;
+        // 30번 카드는 잠금 무시 클래스 부여
+        card.className =
+          'card' +
+          (checkLock() ? ' locked' : '') +
+          (i === 30 ? ' admin-gate' : '');
+
         card.onclick = () => {
-          // 🛠 임시 기능: 30번 클릭 시 즉시 리셋
           if (i === 30) {
-            localStorage.removeItem('quiz_completed');
-            alert('초기화되었습니다.');
-            location.reload();
+            if (confirm('모든 퀴즈 참여 기록을 초기화할까요?')) {
+              localStorage.removeItem('quiz_completed');
+              location.reload();
+            }
             return;
           }
           if (!checkLock()) showQuiz(i);
         };
         grid.appendChild(card);
+      }
+
+      // 🔊 자연스러운 끊어읽기 TTS (0.55초 휴지기)
+      async function speak(text) {
+        window.speechSynthesis.cancel();
+        const parts = text.split('\n');
+        for (const part of parts) {
+          if (!part.trim()) continue;
+          await new Promise((resolve) => {
+            const utterance = new SpeechSynthesisUtterance(part);
+            utterance.lang = 'ko-KR';
+            utterance.rate = 1.0;
+            utterance.onend = () => setTimeout(resolve, 550); // 0.55초 대기
+            window.speechSynthesis.speak(utterance);
+          });
+        }
       }
 
       function showQuiz(num) {
@@ -296,6 +316,7 @@
         };
         document.getElementById('main-page').style.display = 'none';
         document.getElementById('quiz-page').style.display = 'block';
+        document.getElementById('quiz-title').innerText = `${num}번 문제`;
         document.getElementById('question-text').innerText = data.q;
 
         const optGrid = document.getElementById('options-grid');
@@ -313,6 +334,8 @@
           btn.onclick = () => checkAnswer(o, data.ans);
           optGrid.appendChild(btn);
         });
+
+        speak(`${num}번 문제입니다. \n ${data.q} \n 정답을 골라주세요.`);
       }
 
       function checkAnswer(userAns, correctAns) {
@@ -326,9 +349,9 @@
             "<span style='color: #e74c3c;'>아쉽네요! 참여 완료</span>";
         }
         document.getElementById('options-grid').style.pointerEvents = 'none';
-        document
-          .querySelectorAll('.card')
-          .forEach((c) => c.classList.add('locked'));
+        document.querySelectorAll('.card').forEach((c) => {
+          if (!c.classList.contains('admin-gate')) c.classList.add('locked');
+        });
       }
 
       function fireConfetti() {
@@ -351,6 +374,7 @@
       }
 
       function goBack() {
+        window.speechSynthesis.cancel();
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
       }
@@ -366,7 +390,7 @@
         }
         if (clicks >= 3) {
           localStorage.removeItem('quiz_completed');
-          alert('관리자 모드 리셋!');
+          alert('관리자 리셋 완료!');
           location.reload();
         }
       }
