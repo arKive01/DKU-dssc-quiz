@@ -15,6 +15,10 @@
         --accent-color: #007aff;
         --moon-color: #1d1d1f;
         --toggle-bg: #ffffff;
+        /* 선택지 색상 */
+        --btn-o: #34c759;
+        --btn-x: #ff3b30;
+        --btn-choice: #007aff;
       }
 
       body.dark-mode {
@@ -54,7 +58,7 @@
         box-shadow: 0 20px 60px var(--card-shadow);
       }
 
-      /* 🌙 쫀득한 한 바퀴 회전 테마 버튼 */
+      /* 🌙 비밀의 문이 숨겨진 다크모드 버튼 */
       .theme-toggle {
         position: fixed;
         top: 25px;
@@ -63,13 +67,14 @@
         height: 60px;
         border-radius: 50%;
         background: var(--toggle-bg);
-        border: none;
+        border: 1px solid rgba(0, 0, 0, 0.05);
         cursor: pointer;
         z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: center;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        user-select: none;
       }
 
       .theme-toggle svg {
@@ -109,39 +114,63 @@
         font-weight: 700;
         cursor: pointer;
         box-shadow: 0 4px 10px var(--card-shadow);
-        transition: all 0.2s ease;
+        transition: all 0.25s ease;
       }
 
-      /* 한 문제 풀면 모든 카드 잠금 스타일 */
       .card.locked {
-        opacity: 0.4;
+        opacity: 0.3;
         cursor: not-allowed;
         filter: grayscale(1);
         pointer-events: none;
       }
 
-      .card:active:not(.locked) {
-        transform: scale(0.9);
-      }
-
+      /* 🔘 리퀴드 글래스 선택지 버튼 */
       .opt-btn {
-        padding: 15px 35px;
-        border-radius: 15px;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        background: var(--card-bg);
-        color: var(--text-color);
-        font-weight: bold;
-        cursor: pointer;
-        margin: 5px;
-        transition: all 0.2s;
-      }
-
-      .opt-btn:hover {
-        background: var(--accent-color);
+        padding: 18px 45px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
         color: white;
+        font-size: 1.3rem;
+        font-weight: 800;
+        cursor: pointer;
+        margin: 8px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
-      /* 하단 인스타그램 바 */
+      .opt-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.3) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+      }
+
+      .opt-btn:active {
+        transform: scale(0.92);
+      }
+
+      /* O/X 및 일반 문항 색상 구분 */
+      .btn-o {
+        background: var(--btn-o);
+      }
+      .btn-x {
+        background: var(--btn-x);
+      }
+      .btn-choice {
+        background: var(--btn-choice);
+      }
+
+      /* 인스타그램 하단 바 */
       .footer {
         position: fixed;
         bottom: 30px;
@@ -150,15 +179,16 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 12px 25px;
+        padding: 14px 28px;
         background: rgba(255, 255, 255, 0.4);
         backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
         border-radius: 50px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
+        text-decoration: none;
+        color: var(--text-color);
         z-index: 999;
-        user-select: none;
       }
 
       .confetti {
@@ -175,7 +205,8 @@
     </style>
   </head>
   <body>
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+    <!-- 다크모드 버튼 (1회 클릭: 모드 전환 / 3회 클릭: 리셋) -->
+    <button class="theme-toggle" onclick="handleThemeClick()" id="themeBtn">
       <svg viewBox="0 0 24 24">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
       </svg>
@@ -194,23 +225,26 @@
         <div
           id="question-text"
           style="
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             margin: 40px 0;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.6;
           "
         ></div>
-        <div id="options-grid"></div>
+        <div
+          id="options-grid"
+          style="display: flex; justify-content: center; flex-wrap: wrap"
+        ></div>
         <div
           id="result-msg"
-          style="margin-top: 25px; font-size: 1.2rem; font-weight: bold"
+          style="margin-top: 30px; font-size: 1.4rem; font-weight: 800"
         ></div>
         <button
           onclick="goBack()"
           style="
             margin-top: 40px;
-            padding: 12px 50px;
-            border-radius: 15px;
+            padding: 14px 55px;
+            border-radius: 18px;
             border: none;
             background: var(--text-color);
             color: var(--bg-color);
@@ -218,21 +252,22 @@
             cursor: pointer;
           "
         >
-          목록으로
+          목록으로 돌아가기
         </button>
       </div>
     </div>
 
-    <div class="footer" onclick="adminReset()">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <!-- 푸터 (순수 링크 기능) -->
+    <a href="https://www.instagram.com/dku_dssc" target="_blank" class="footer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
         <path
           d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 0-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
         />
       </svg>
-      <span id="admin-text" style="font-weight: 600; font-size: 0.9rem"
+      <span style="font-weight: 700; font-size: 0.95rem; letter-spacing: -0.5px"
         >단국대 장애학생지원센터</span
       >
-    </div>
+    </a>
 
     <script>
       const quizData = {
@@ -253,7 +288,6 @@
         },
       };
 
-      // 초기화 상태 체크
       const checkLock = () => localStorage.getItem('quiz_completed') === 'true';
 
       const grid = document.getElementById('card-grid');
@@ -298,6 +332,12 @@
           const btn = document.createElement('button');
           btn.className = 'opt-btn';
           btn.innerText = o;
+
+          // O/X 인지 일반 선택지인지에 따라 색상 클래스 부여
+          if (o === 'O') btn.classList.add('btn-o');
+          else if (o === 'X') btn.classList.add('btn-x');
+          else btn.classList.add('btn-choice');
+
           btn.onclick = () => checkAnswer(num, o, data.ans);
           optGrid.appendChild(btn);
         });
@@ -306,11 +346,11 @@
       }
 
       function checkAnswer(num, userAns, correctAns) {
-        localStorage.setItem('quiz_completed', 'true'); // 단 한 번이라도 풀면 전체 잠금
+        localStorage.setItem('quiz_completed', 'true');
         const msg = document.getElementById('result-msg');
 
         if (userAns === correctAns) {
-          msg.innerHTML = "<span style='color: #4cd964;'>정답입니다! 🎉</span>";
+          msg.innerHTML = "<span style='color: #34c759;'>정답입니다! 🎉</span>";
           fireConfetti();
         } else {
           msg.innerHTML =
@@ -318,28 +358,29 @@
         }
 
         document.getElementById('options-grid').style.pointerEvents = 'none';
-        // 메인 화면 카드들 즉시 잠금
         document
           .querySelectorAll('.card')
           .forEach((c) => c.classList.add('locked'));
       }
 
+      // 🎉 폭죽 효과 업그레이드 (개수 1.5배, 크기 35% 증가)
       function fireConfetti() {
-        const emojis = ['🎉', '🎊', '✨', '🎈'];
-        for (let i = 0; i < 30; i++) {
+        const emojis = ['🎉', '🎊', '✨', '🎈', '🎆'];
+        for (let i = 0; i < 45; i++) {
+          // 개수 증가
           const c = document.createElement('div');
           c.className = 'confetti';
           c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
           c.style.left = Math.random() * 100 + 'vw';
-          c.style.top = '-50px';
-          c.style.fontSize = Math.random() * 20 + 20 + 'px';
-          c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
+          c.style.top = '-60px';
+          c.style.fontSize = Math.random() * 25 + 30 + 'px'; // 크기 증가
+          c.style.transition = `all ${Math.random() * 2.5 + 2.5}s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
           document.body.appendChild(c);
           setTimeout(() => {
-            c.style.top = '110vh';
-            c.style.transform = `rotate(${Math.random() * 360}deg)`;
+            c.style.top = '115vh';
+            c.style.transform = `rotate(${Math.random() * 720}deg) translateX(${Math.random() * 150 - 75}px)`;
           }, 10);
-          setTimeout(() => c.remove(), 4000);
+          setTimeout(() => c.remove(), 5000);
         }
       }
 
@@ -349,23 +390,36 @@
         document.getElementById('quiz-page').style.display = 'none';
       }
 
+      // 🤫 야간모드 버튼 클릭 핸들러 (1회: 테마 / 3회: 리셋)
+      let clickTimer = null;
+      let clicks = 0;
+
+      function handleThemeClick() {
+        clicks++;
+
+        // 테마 전환 (즉시 실행)
+        if (clicks === 1) {
+          toggleTheme();
+          clickTimer = setTimeout(() => {
+            clicks = 0;
+          }, 600); // 0.6초 내에 추가 클릭 없으면 초기화
+        }
+
+        // 3회 연속 클릭 시 리셋
+        if (clicks >= 3) {
+          localStorage.removeItem('quiz_completed');
+          alert('관리자 모드: 모든 데이터가 리셋되었습니다.');
+          location.reload();
+          clicks = 0;
+          clearTimeout(clickTimer);
+        }
+      }
+
       function toggleTheme() {
         const btn = document.getElementById('themeBtn');
         btn.classList.add('rolling');
         document.body.classList.toggle('dark-mode');
         setTimeout(() => btn.classList.remove('rolling'), 600);
-      }
-
-      // 🤫 관리자 리셋 기능 (인스타그램 문구 3번 클릭)
-      let clickCount = 0;
-      function adminReset() {
-        clickCount++;
-        if (clickCount >= 3) {
-          localStorage.removeItem('quiz_completed');
-          alert('관리자 모드: 퀴즈 잠금이 해제되었습니다.');
-          location.reload();
-        }
-        setTimeout(() => (clickCount = 0), 2000); // 2초 내에 3번 클릭해야 함
       }
     </script>
   </body>
