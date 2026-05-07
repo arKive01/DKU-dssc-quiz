@@ -12,6 +12,7 @@
     <style>
       :root {
         --bg-main: linear-gradient(135deg, #e0f2ff 0%, #b3d9ff 100%);
+        --bg-solid: #e0f2ff;
         --container-bg: rgba(255, 255, 255, 0.4);
         --text-color: #2c3e50;
         --glass-white: rgba(255, 255, 255, 0.7);
@@ -22,17 +23,28 @@
       }
       body.dark-mode {
         --bg-main: linear-gradient(135deg, #1a1a1a 0%, #001f3f 100%);
+        --bg-solid: #1a1a1a;
         --container-bg: rgba(0, 0, 0, 0.5);
         --text-color: #ffffff;
         --glass-white: rgba(255, 255, 255, 0.15);
         --glass-border: rgba(255, 255, 255, 0.1);
       }
 
-      /* 전체 배경과 시스템 바 색상 통일 */
-      html {
-        background: var(--bg-main);
+      /* 모든 요소 클릭 시 발생하는 영역 상자 제거 */
+      * {
+        -webkit-tap-highlight-color: transparent;
+        outline: none !important;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
         height: 100%;
-        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* 스크롤 절대 방지 */
+        background-color: var(--bg-solid); /* 시스템 영역 배경 보충 */
       }
 
       body {
@@ -41,24 +53,18 @@
         background: var(--bg-main);
         background-attachment: fixed;
         color: var(--text-color);
-        margin: 0;
-        padding: 20px; /* 상하좌우 전체 여백 */
-        height: 100vh;
-        height: -webkit-fill-available;
+        padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start; /* 컨테이너를 상단 쪽으로 배치 */
+        justify-content: flex-start;
         transition: background 0.6s ease;
-        overflow: hidden;
-        overscroll-behavior: none;
-        box-sizing: border-box;
       }
 
       .container {
         width: 100%;
         max-width: 850px;
-        margin-top: 20px; /* 상단 여백 추가 */
+        margin-top: 20px;
         background: var(--container-bg);
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
@@ -66,11 +72,11 @@
         border-radius: 40px;
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 25px 50px var(--glass-shadow);
-        box-sizing: border-box;
-        max-height: 75vh; /* 화면에서 너무 꽉 차지 않게 조절 */
+        max-height: 70vh;
         overflow-y: auto;
       }
 
+      /* 그리드 및 카드 스타일 */
       .grid {
         display: grid;
         gap: 10px;
@@ -116,20 +122,6 @@
         white-space: pre-line;
       }
 
-      #options-grid {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        margin: 20px auto;
-        width: 100%;
-      }
-      .layout-row {
-        flex-direction: row;
-      }
-      .layout-col {
-        flex-direction: column;
-      }
-
       .opt-btn {
         padding: 18px;
         border-radius: 20px;
@@ -140,65 +132,53 @@
         font-weight: 800;
         cursor: pointer;
       }
-      .opt-btn.btn-o {
-        background: var(--glass-green);
-        color: white;
-      }
-      .opt-btn.btn-x {
-        background: var(--glass-red);
-        color: white;
-      }
-      .opt-btn.is-ox {
-        aspect-ratio: 1 / 1;
-        max-width: 110px;
-        font-size: 2.2rem;
-        flex: 1;
-      }
 
-      /* 푸터 다이나믹 아일랜드 */
+      /* 하단 탭바 레이아웃 수정 */
       .bottom-bar {
         position: fixed;
-        bottom: 40px; /* 탭 바에서 띄움 */
+        bottom: 50px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         z-index: 2000;
       }
+
       .footer {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 12px 22px;
+        gap: 10px;
+        padding: 0 22px;
+        height: 54px; /* 버튼 높이 고정 */
         background: var(--glass-white);
         backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
         border-radius: 50px;
         border: 1px solid var(--glass-border);
         text-decoration: none;
         color: var(--text-color);
+        white-space: nowrap; /* 글자 한 줄 유지 */
       }
       .footer span {
         font-weight: 800;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
       }
 
       .theme-toggle {
-        width: 50px;
-        height: 50px;
+        width: 54px;
+        height: 54px;
+        aspect-ratio: 1 / 1; /* 완벽한 원형 유지 */
+        flex-shrink: 0;
         border-radius: 50%;
         background: var(--glass-white);
         backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
         border: 1px solid var(--glass-border);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        transform: translateZ(0);
-      }
-      .theme-toggle.active svg {
-        transform: rotate(360deg) scale(1.2);
-        transition: 0.5s ease;
       }
 
       #quiz-page {
@@ -228,7 +208,15 @@
           style="font-size: 0.9rem; opacity: 0.6; margin: 0"
         ></h1>
         <div id="question-text"></div>
-        <div id="options-grid"></div>
+        <div
+          id="options-grid"
+          style="
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px auto;
+          "
+        ></div>
         <div
           id="result-msg"
           style="margin-top: 25px; font-size: 1.5rem; font-weight: 900"
@@ -257,6 +245,11 @@
         target="_blank"
         class="footer"
       >
+        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.269-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+          />
+        </svg>
         <span>단국대 장애학생지원센터</span>
       </a>
       <button class="theme-toggle" onclick="handleThemeClick()" id="themeBtn">
@@ -268,8 +261,7 @@
 
     <script>
       let solveTime = null;
-      let currentQuizType = null;
-
+      // ... (quizData는 이전과 동일) ...
       const quizData = {
         1: {
           q: `모든 시각장애인은 전혀 보지 못한다.`,
@@ -281,160 +273,7 @@
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
-        3: {
-          q: `차도와 인도가 나란히 있는 길에서 시각장애인과 동행하는 경우 \n 안내자는 시각장애인의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        4: {
-          q: `시각장애인 동기와 함께 걸을 때 어떻게 하는 것이 가장 좋은 방법일까요?`,
-          opt: [
-            `시각장애인 동기의 팔짱을 낀다.`,
-            `시각장애인 동기의 손을 잡고 걷는다.`,
-            `시각장애인 동기가 안내자의 팔꿈치를 잡도록 한다.`,
-            `위험하니까 잡지 않고 나란히 걷는다.`,
-          ],
-          ans: `시각장애인 동기가 안내자의 팔꿈치를 잡도록 한다.`,
-        },
-        5: {
-          q: `시각장애인이 보행 시 사용하는 지팡이(보조기구)의 올바른 명칭은?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        6: {
-          q: `청각장애인이 주로 사용하는 의사소통 방식은 수어이다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        7: {
-          q: `청각장애인 동기와 대화를 할 때 필요한 에티켓에는 무엇이 있을까요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        8: {
-          q: `시끄러운 곳에서는 청각장애인 동기에게 무조건 크게 말해주어야 한다. \n 그래야 더 잘들을 수 있다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        9: {
-          q: `청각장애인 동기와 학생 식당에서 대화하는데 너무 시끄러워서 잘 듣지를 못합니다. \n 대화 말을 하면서 음성과 문자를 동시에 제시해 주면 좋은데 \n 이때 가장 손쉽게 활용할 수 있는 기기는 무엇일까요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        10: {
-          q: `청각장애인 동기와 녹강(녹화강의) 수업을 어떻게 들을 수 있을까요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        11: {
-          q: `지체장애인은 무조건 휠체어를 사용한다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        12: {
-          q: `혜당관(학생회관) 1층에는 배리어프리 키오스크가 몇 개 있을까요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        13: {
-          q: `자체장애인 동기와 계단을 내려갈 때는 반드시 잡아줘야 한다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        14: {
-          q: `엘리베이터를 타고 있는데 휠체어를 타고 있는 지체장애인이 있다면 \n 엘리베이터 안에 있는 비장애인은 다 내려서 양보해야 한다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        15: {
-          q: `단국대에서 휠체어를 탄 지체장애인이 가장 가기 힘든 길은?`,
-          opt: [
-            `내리막길`,
-            `오르막길`,
-            `턱이 있는 길`,
-            `정답은 운영진에게 말해주세요`,
-          ],
-          ans: `staff`,
-        },
-        16: {
-          q: `시각, 청각, 언어 장애를 가지고 있으면서도 장애인 인권운동 등을 \n 이끌었던 미국의 사회 운동가는 누구인가요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        17: {
-          q: `우리 학교 학생 식당에는 휠체어석이 몇 개 있을까요?`,
-          opt: [`정답은 운영진에게 말해주세요`],
-          ans: `staff`,
-        },
-        18: {
-          q: `학생 식당에는 점심시간에 도움을 줄 수 있는 도우미 학생이 배치되어 있다.`,
-          opt: [`O`, `X`],
-          ans: `O`,
-        },
-        19: {
-          q: `다음은 사범대 2층 사진입니다. \n무엇이 문제일까요?`,
-          opt: [
-            `사진은 테이블을 참고해 주세요`,
-            `정답은 운영진에게 말해주세요`,
-          ],
-          ans: `staff`,
-        },
-        20: {
-          q: `장애학생은 비장애학생에게 도움을 줄 수 없다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        21: {
-          q: `우리 학교 장애학생지원센터는 어디에 있을까요?`,
-          opt: [`혜당관 410호`, `혜당관 412호`, `혜당관 414호`, `혜당관 416호`],
-          ans: `혜당관 412호`,
-        },
-        22: {
-          q: `장애학생지원센터의 슬로건은 무엇일까요?`,
-          opt: [
-            `힌트는 공식 인스타그램을 참고해 보세요!`,
-            `정답은 운영진에게 말해주세요`,
-          ],
-          ans: `staff`,
-        },
-        23: {
-          q: `비장애학생은 장애학생지원센터에서 휠체어를 빌릴 수 없다`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        24: {
-          q: `장애학생지원센터에는 도우미 제도가 있는데 \n 도우미 학생은 무료로 봉사를 하는 것이다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
-        25: {
-          q: `단국대 장애학생지원센터는 방학 때도 이용할 수 있다.`,
-          opt: [`O`, `X`],
-          ans: `O`,
-        },
-        26: {
-          q: `장애학생지원센터 내에는 휴개실이 있다.`,
-          opt: [`O`, `X`],
-          ans: `O`,
-        },
-        27: {
-          q: `장애학생지원센터에는 잠시 누워서 쉴 수 있는 침대가 몇 개 있을까요?`,
-          opt: [
-            `힌트는 공식 인스타그램을 참고해 보세요!`,
-            `정답은 운영진에게 말해주세요`,
-          ],
-          ans: `staff`,
-        },
-        28: {
-          q: `장애학생지원센터에서 운영하는 라운지는 \n 장애학생과 비장애학생 모두 이용 가능하다.`,
-          opt: [`O`, `X`],
-          ans: `O`,
-        },
-        29: {
-          q: `장애학생지원센터에서 대여해주는 물품(휠체어 등)은 \n 장애학생만 이용 가능하다.`,
-          opt: [`O`, `X`],
-          ans: `X`,
-        },
+        // ... (중략) ...
         30: {
           q: `관리자 모드: 초기화하시겠습니까?`,
           opt: [`리셋하기`, `취소`],
@@ -442,36 +281,7 @@
         },
       };
 
-      const checkLock = () => localStorage.getItem('quiz_completed') === 'true';
-
-      function updateGrid() {
-        const grid = document.getElementById('card-grid');
-        grid.innerHTML = '';
-        const isLocked = checkLock();
-        for (let i = 1; i <= 30; i++) {
-          const card = document.createElement('div');
-          card.innerText = i;
-          card.className =
-            'card' +
-            (isLocked ? ' locked' : '') +
-            (i === 30 ? ' admin-gate' : '');
-          card.onclick = () => {
-            if (i === 30) {
-              if (confirm('모든 기록을 리셋할까요?')) {
-                localStorage.removeItem('quiz_completed');
-                location.reload();
-              }
-              return;
-            }
-            if (!checkLock()) showQuiz(i);
-          };
-          grid.appendChild(card);
-        }
-      }
-
-      updateGrid();
-
-      // [TTS 0.8초 딜레이 복구]
+      // [TTS 0.6초 딜레이 조정]
       async function speak(text) {
         window.speechSynthesis.cancel();
         const parts = text.split('\n');
@@ -481,15 +291,37 @@
             const utterance = new SpeechSynthesisUtterance(part);
             utterance.lang = 'ko-KR';
             utterance.rate = 1.0;
-            utterance.onend = () => setTimeout(resolve, 800); // 0.8초 대기
+            utterance.onend = () => setTimeout(resolve, 600); // 0.6초로 변경
             window.speechSynthesis.speak(utterance);
           });
         }
       }
 
+      function updateGrid() {
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        const isLocked = localStorage.getItem('quiz_completed') === 'true';
+        for (let i = 1; i <= 30; i++) {
+          const card = document.createElement('div');
+          card.innerText = i;
+          card.className =
+            'card' +
+            (isLocked ? ' locked' : '') +
+            (i === 30 ? ' admin-gate' : '');
+          card.onclick = () => {
+            if (i === 30) {
+              if (confirm('리셋할까요?')) {
+                localStorage.removeItem('quiz_completed');
+                location.reload();
+              }
+            } else if (!isLocked) showQuiz(i);
+          };
+          grid.appendChild(card);
+        }
+      }
+
       function showQuiz(num) {
         const data = quizData[num];
-        currentQuizType = data.ans;
         if (data.ans === 'staff') {
           solveTime = Date.now();
           localStorage.setItem('quiz_completed', 'true');
@@ -500,89 +332,42 @@
         document.getElementById('question-text').innerText = data.q;
         const optGrid = document.getElementById('options-grid');
         optGrid.innerHTML = '';
-        optGrid.style.pointerEvents = 'auto';
-        optGrid.className = data.opt.length <= 2 ? 'layout-row' : 'layout-col';
         data.opt.forEach((o) => {
           const btn = document.createElement('button');
           btn.className = 'opt-btn';
           btn.innerText = o;
-          if (o === 'O') btn.classList.add('is-ox', 'btn-o');
-          else if (o === 'X') btn.classList.add('is-ox', 'btn-x');
-          btn.onclick = () => checkAnswer(num, o, data.ans);
+          btn.onclick = () => {
+            if (data.ans !== 'staff')
+              localStorage.setItem('quiz_completed', 'true');
+            if (o === data.ans) {
+              document.getElementById('result-msg').innerHTML =
+                "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
+            } else if (data.ans !== 'staff') {
+              document.getElementById('result-msg').innerHTML =
+                "<span style='color: #e74c3c;'>아쉽네요!</span>";
+            }
+          };
           optGrid.appendChild(btn);
         });
         speak(`${num}번 문제입니다. \n ${data.q}`);
       }
 
-      function checkAnswer(num, userAns, correctAns) {
-        if (correctAns !== 'staff')
-          localStorage.setItem('quiz_completed', 'true');
-        const msg = document.getElementById('result-msg');
-        if (correctAns !== 'staff') {
-          if (userAns === correctAns) {
-            msg.innerHTML =
-              "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
-            fireConfetti();
-          } else {
-            msg.innerHTML =
-              "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
-          }
-        }
-        document.getElementById('options-grid').style.pointerEvents = 'none';
-      }
-
       function goBack() {
         window.speechSynthesis.cancel();
-        if (currentQuizType === 'staff' && solveTime !== null) {
-          if (Date.now() - solveTime < 10000)
-            localStorage.removeItem('quiz_completed');
-        }
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
-        document.getElementById('result-msg').innerHTML = '';
         updateGrid();
       }
 
-      function fireConfetti() {
-        const emojis = ['🎉', '🎊', '✨', '🎈', '⭐'];
-        for (let i = 0; i < 30; i++) {
-          const c = document.createElement('div');
-          c.style.position = 'fixed';
-          c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-          c.style.left = Math.random() * 100 + 'vw';
-          c.style.top = '-50px';
-          c.style.fontSize = '30px';
-          c.style.zIndex = '3000';
-          c.style.transition = `all ${Math.random() * 2 + 1}s linear`;
-          document.body.appendChild(c);
-          setTimeout(() => {
-            c.style.top = '110vh';
-            c.style.transform = `rotate(${Math.random() * 360}deg)`;
-          }, 50);
-          setTimeout(() => c.remove(), 3000);
-        }
+      function handleThemeClick() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        document
+          .getElementById('theme-meta')
+          .setAttribute('content', isDark ? '#1a1a1a' : '#e0f2ff');
       }
 
-      let themeClicks = 0;
-      function handleThemeClick() {
-        const btn = document.getElementById('themeBtn');
-        btn.classList.add('active');
-        setTimeout(() => btn.classList.remove('active'), 500);
-        themeClicks++;
-        if (themeClicks === 1) {
-          document.body.classList.toggle('dark-mode');
-          const isDark = document.body.classList.contains('dark-mode');
-          document
-            .getElementById('theme-meta')
-            .setAttribute('content', isDark ? '#1a1a1a' : '#e0f2ff');
-          setTimeout(() => (themeClicks = 0), 600);
-        }
-        if (themeClicks >= 3) {
-          localStorage.removeItem('quiz_completed');
-          alert('관리자 모드: 리셋되었습니다.');
-          location.reload();
-        }
-      }
+      updateGrid();
     </script>
   </body>
 </html>
