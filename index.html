@@ -20,25 +20,46 @@
 
     <style>
       :root {
-        --bg-main: linear-gradient(135deg, #e0f2ff 0%, #b3d9ff 100%);
+        --bg-main: linear-gradient(180deg, #b3d9ff 0%, #d9ecff 100%);
+        --bg-solid: #b3d9ff;
+
         --container-bg: rgba(255, 255, 255, 0.4);
         --text-color: #2c3e50;
+
         --glass-white: rgba(255, 255, 255, 0.7);
         --glass-border: rgba(255, 255, 255, 0.5);
         --glass-shadow: rgba(0, 0, 0, 0.05);
+
         --glass-green: rgba(52, 199, 89, 0.85);
         --glass-red: rgba(255, 59, 48, 0.85);
+
+        /* 목록으로 돌아가기 버튼 */
+        --back-btn-bg: #2c3e50;
+        --back-btn-text: #ffffff;
+
+        /* 달 아이콘 */
+        --moon-color: #0a84ff;
       }
 
       body.dark-mode {
-        --bg-main: linear-gradient(135deg, #1a1a1a 0%, #001f3f 100%);
+        --bg-main: linear-gradient(180deg, #001f3f 0%, #1a1a1a 100%);
+        --bg-solid: #001f3f;
+
         --container-bg: rgba(0, 0, 0, 0.5);
         --text-color: #ffffff;
+
         --glass-white: rgba(255, 255, 255, 0.15);
         --glass-border: rgba(255, 255, 255, 0.1);
+
+        /* 저시력 가독성 고려 */
+        --back-btn-bg: #7da8d6;
+        --back-btn-text: #0f1720;
+
+        /* 개나리 느낌 노랑 */
+        --moon-color: #ffd93b;
       }
 
-      /* 전체 스크롤 제거 + 빈 공간 색 통일 */
+      /* 전체 스크롤 제거 + 상하단 배경 연결 */
       html,
       body {
         width: 100%;
@@ -47,30 +68,45 @@
         overscroll-behavior: none;
         -webkit-overflow-scrolling: auto;
         touch-action: manipulation;
-        background: #b3d9ff;
-      }
-
-      body.dark-mode {
-        background: #001f3f;
+        background: var(--bg-solid);
       }
 
       body {
         font-family: 'Pretendard', sans-serif;
         text-align: center;
-        background: var(--bg-main);
+
+        background:
+          linear-gradient(
+            to bottom,
+            var(--bg-solid) 0%,
+            var(--bg-solid) 8%,
+            transparent 18%,
+            transparent 82%,
+            var(--bg-solid) 92%,
+            var(--bg-solid) 100%
+          ),
+          var(--bg-main);
+
         background-attachment: fixed;
         background-repeat: no-repeat;
         background-size: cover;
+
         color: var(--text-color);
+
         margin: 0;
+
         min-height: 100dvh;
         height: 100dvh;
+
         padding: env(safe-area-inset-top) 20px
           calc(env(safe-area-inset-bottom) + 120px) 20px;
+
         box-sizing: border-box;
+
         transition:
           background 0.6s ease,
           color 0.4s ease;
+
         display: flex;
         align-items: center;
         justify-content: center;
@@ -79,16 +115,26 @@
       .container {
         width: 100%;
         max-width: 850px;
+
         max-height: calc(100dvh - 40px);
+
         overflow: hidden;
+
         margin: 0 auto;
+
         background: var(--container-bg);
+
         backdrop-filter: blur(25px);
         -webkit-backdrop-filter: blur(25px);
+
         padding: 30px 20px;
+
         border-radius: 40px;
+
         border: 1px solid rgba(255, 255, 255, 0.3);
+
         box-shadow: 0 25px 50px var(--glass-shadow);
+
         box-sizing: border-box;
       }
 
@@ -125,19 +171,28 @@
 
       .card {
         aspect-ratio: 1 / 1;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         background: var(--glass-white);
+
         border: 1px solid var(--glass-border);
+
         border-radius: 18px;
+
         font-size: 1.2rem;
         font-weight: 800;
+
         cursor: pointer;
+
         box-shadow: 0 5px 15px var(--glass-shadow);
+
         transition:
           transform 0.2s,
           background 0.4s;
+
         -webkit-tap-highlight-color: transparent;
       }
 
@@ -184,19 +239,28 @@
 
       .opt-btn {
         padding: 18px;
+
         border-radius: 20px;
+
         border: 1px solid var(--glass-border);
+
         background: var(--glass-white);
+
         color: var(--text-color);
+
         font-size: 1.2rem;
         font-weight: 800;
+
         cursor: pointer;
+
         position: relative;
         overflow: hidden;
+
         transition:
           transform 0.18s ease,
           opacity 0.25s ease,
           background 0.4s;
+
         -webkit-tap-highlight-color: transparent;
       }
 
@@ -221,33 +285,74 @@
         flex: 1;
       }
 
+      /* 목록으로 돌아가기 버튼 */
+      .back-btn {
+        margin-top: 40px;
+        padding: 15px 50px;
+
+        border-radius: 20px;
+        border: none;
+
+        background: var(--back-btn-bg);
+        color: var(--back-btn-text);
+
+        font-weight: 800;
+
+        cursor: pointer;
+
+        transition:
+          background 0.4s ease,
+          color 0.4s ease,
+          transform 0.2s ease;
+      }
+
+      .back-btn:active {
+        transform: scale(0.96);
+      }
+
       /* 푸터 다이나믹 아일랜드 스타일 */
       .bottom-bar {
         position: fixed;
+
         bottom: 30px;
         left: 50%;
+
         transform: translateX(-50%);
+
         display: flex;
         align-items: center;
+
         gap: 10px;
+
         z-index: 2000;
       }
 
       .footer {
         display: flex;
         align-items: center;
+
         gap: 8px;
+
         padding: 12px 22px;
+
         background: var(--glass-white);
+
         backdrop-filter: blur(15px);
+
         border-radius: 50px;
+
         border: 1px solid var(--glass-border);
+
         text-decoration: none;
+
         color: var(--text-color);
+
         white-space: nowrap;
+
         transition:
           transform 0.2s ease,
           background 0.4s;
+
         -webkit-tap-highlight-color: transparent;
       }
 
@@ -264,27 +369,40 @@
       .theme-toggle {
         width: 50px;
         height: 50px;
+
         border-radius: 50%;
+
         background: var(--glass-white);
+
         backdrop-filter: blur(15px);
+
         border: 1px solid var(--glass-border);
+
         cursor: pointer;
+
         display: flex;
         align-items: center;
         justify-content: center;
+
         transition:
           transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
           background 0.4s,
           opacity 0.2s;
+
         will-change: transform;
+
         -webkit-tap-highlight-color: transparent;
       }
 
       .theme-toggle svg {
         transition:
           transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-          opacity 0.3s ease;
+          opacity 0.3s ease,
+          fill 0.4s ease;
+
         will-change: transform;
+
+        fill: var(--moon-color);
       }
 
       /* 모바일에서도 확실하게 동작 */
@@ -324,21 +442,7 @@
           style="margin-top: 25px; font-size: 1.5rem; font-weight: 900"
         ></div>
 
-        <button
-          onclick="goBack()"
-          style="
-            margin-top: 40px;
-            padding: 15px 50px;
-            border-radius: 20px;
-            border: none;
-            background: var(--text-color);
-            color: white;
-            font-weight: 800;
-            cursor: pointer;
-          "
-        >
-          목록으로 돌아가기
-        </button>
+        <button onclick="goBack()" class="back-btn">목록으로 돌아가기</button>
       </div>
     </div>
 
@@ -358,7 +462,7 @@
       </a>
 
       <button class="theme-toggle" onclick="handleThemeClick()" id="themeBtn">
-        <svg viewBox="0 0 24 24" width="24" fill="currentColor">
+        <svg viewBox="0 0 24 24" width="24">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
@@ -381,12 +485,14 @@
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         3: {
           q: `차도와 인도가 나란히 있는 길에서 시각장애인과 동행하는 경우 \n
               안내자는 시각장애인의 오른쪽과 왼쪽 중 어느 쪽에서 걸어가는 것이 좋을까요?`,
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         4: {
           q: `시각장애인 동기와 함께 걸을 때 어떻게 하는 것이 가장 좋은 방법일까요?`,
           opt: [
@@ -397,6 +503,7 @@
           ],
           ans: `시각장애인 동기가 안내자의 팔꿈치를 잡도록 한다.`,
         },
+
         5: {
           q: `시각장애인이 보행 시 사용하는 지팡이(보조기구)의 올바른 명칭은?`,
           opt: [`정답은 운영진에게 말해주세요`],
@@ -408,17 +515,20 @@
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         7: {
           q: `청각장애인 동기와 대화를 할 때 필요한 에티켓에는 무엇이 있을까요?`,
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         8: {
           q: `시끄러운 곳에서는 청각장애인 동기에게 무조건 크게 말해주어야 한다. \n
               그래야 더 잘들을 수 있다.`,
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         9: {
           q: `청각장애인 동기와 학생 식당에서 대화하는데 너무 시끄러워서 잘 듣지를 못합니다. \n
               대화 말을 하면서 음성과 문자를 동시에 제시해 주면 좋은데 \n
@@ -426,6 +536,7 @@
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         10: {
           q: `청각장애인 동기와 녹강(녹화강의) 수업을 어떻게 들을 수 있을까요?`,
           opt: [`정답은 운영진에게 말해주세요`],
@@ -437,22 +548,26 @@
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         12: {
           q: `혜당관(학생회관) 1층에는 배리어프리 키오스크가 몇 개 있을까요?`,
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         13: {
           q: `자체장애인 동기와 계단을 내려갈 때는 반드시 잡아줘야 한다.`,
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         14: {
           q: `엘리베이터를 타고 있는데 휠체어를 타고 있는 지체장애인이 있다면 \n
               엘리베이터 안에 있는 비장애인은 다 내려서 양보해야 한다.`,
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         15: {
           q: `단국대에서 휠체어를 탄 지체장애인이 가장 가기 힘든 길은?`,
           opt: [
@@ -470,16 +585,19 @@
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         17: {
           q: `우리 학교 학생 식당에는 휠체어석이 몇 개 있을까요?`,
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
+
         18: {
           q: `학생 식당에는 점심시간에 도움을 줄 수 있는 도우미 학생이 배치되어 있다.`,
           opt: [`O`, `X`],
           ans: `O`,
         },
+
         19: {
           q: `다음은 사범대 2층 사진입니다. \n무엇이 문제일까요?`,
           opt: [
@@ -488,6 +606,7 @@
           ],
           ans: `staff`,
         },
+
         20: {
           q: `장애학생은 비장애학생에게 도움을 줄 수 없다.`,
           opt: [`O`, `X`],
@@ -499,6 +618,7 @@
           opt: [`혜당관 410호`, `혜당관 412호`, `혜당관 414호`, `혜당관 416호`],
           ans: `혜당관 412호`,
         },
+
         22: {
           q: `장애학생지원센터의 슬로건은 무엇일까요?`,
           opt: [
@@ -507,17 +627,20 @@
           ],
           ans: `staff`,
         },
+
         23: {
           q: `비장애학생은 장애학생지원센터에서 휠체어를 빌릴 수 없다`,
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         24: {
           q: `장애학생지원센터에는 도우미 제도가 있는데 \n
               도우미 학생은 무료로 봉사를 하는 것이다.`,
           opt: [`O`, `X`],
           ans: `X`,
         },
+
         25: {
           q: `단국대 장애학생지원센터는 방학 때도 이용할 수 있다.`,
           opt: [`O`, `X`],
@@ -529,6 +652,7 @@
           opt: [`O`, `X`],
           ans: `O`,
         },
+
         27: {
           q: `장애학생지원센터에는 잠시 누워서 쉴 수 있는 침대가 몇 개 있을까요?`,
           opt: [
@@ -537,12 +661,14 @@
           ],
           ans: `staff`,
         },
+
         28: {
           q: `장애학생지원센터에서 운영하는 라운지는 \n
               장애학생과 비장애학생 모두 이용 가능하다.`,
           opt: [`O`, `X`],
           ans: `O`,
         },
+
         29: {
           q: `장애학생지원센터에서 대여해주는 물품(휠체어 등)은 \n
               장애학생만 이용 가능하다.`,
@@ -571,6 +697,7 @@
 
       function updateGrid() {
         const grid = document.getElementById('card-grid');
+
         grid.innerHTML = '';
 
         const isLocked = checkLock();
@@ -591,6 +718,7 @@
                 localStorage.removeItem('quiz_completed');
                 location.reload();
               }
+
               return;
             }
 
@@ -615,6 +743,7 @@
             const utterance = new SpeechSynthesisUtterance(part);
 
             utterance.lang = 'ko-KR';
+
             utterance.rate = 1.0;
 
             utterance.onend = () => setTimeout(resolve, 550);
@@ -635,12 +764,14 @@
 
         if (data.ans === 'staff') {
           solveTime = Date.now();
+
           localStorage.setItem('quiz_completed', 'true');
         } else {
           solveTime = null;
         }
 
         document.getElementById('main-page').style.display = 'none';
+
         document.getElementById('quiz-page').style.display = 'block';
 
         document.getElementById('quiz-title').innerText = `${num}번 문제`;
@@ -650,6 +781,7 @@
         const optGrid = document.getElementById('options-grid');
 
         optGrid.innerHTML = '';
+
         optGrid.style.pointerEvents = 'auto';
 
         optGrid.className = data.opt.length <= 2 ? 'layout-row' : 'layout-col';
@@ -658,6 +790,7 @@
           const btn = document.createElement('button');
 
           btn.className = 'opt-btn';
+
           btn.innerText = o;
 
           if (o === 'O') btn.classList.add('is-ox', 'btn-o');
@@ -705,6 +838,7 @@
         }
 
         document.getElementById('main-page').style.display = 'block';
+
         document.getElementById('quiz-page').style.display = 'none';
 
         document.getElementById('result-msg').innerHTML = '';
@@ -721,12 +855,15 @@
           const c = document.createElement('div');
 
           c.style.position = 'fixed';
+
           c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
 
           c.style.left = Math.random() * 100 + 'vw';
+
           c.style.top = '-50px';
 
           c.style.fontSize = '40px';
+
           c.style.zIndex = '3000';
 
           c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
@@ -735,6 +872,7 @@
 
           setTimeout(() => {
             c.style.top = '110vh';
+
             c.style.transform = `rotate(${Math.random() * 360}deg)`;
           }, 50);
 
@@ -747,8 +885,8 @@
       function handleThemeClick() {
         const btn = document.getElementById('themeBtn');
 
-        /* 모바일 Safari 강제 리플로우 */
         btn.classList.remove('active');
+
         void btn.offsetWidth;
 
         btn.classList.add('active');
