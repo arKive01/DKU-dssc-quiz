@@ -17,7 +17,15 @@
     <title>퀴즈 Time!</title>
     <style>
       :root {
-        --bg-main: linear-gradient(180deg, #b3d9ff 0%, #d9ecff 100%);
+        --bg-main: linear-gradient(
+          180deg,
+          #b3d9ff 0%,
+          #b3d9ff 10%,
+          #cce7ff 35%,
+          #d9ecff 65%,
+          #b3d9ff 90%,
+          #b3d9ff 100%
+        );
         --bg-solid: #b3d9ff;
         --container-bg: rgba(255, 255, 255, 0.4);
         --text-color: #2c3e50;
@@ -32,8 +40,16 @@
         /* 달 아이콘 */
         --moon-color: #0a84ff;
       }
-      body.dark-mode {
-        --bg-main: linear-gradient(180deg, #001f3f 0%, #1a1a1a 100%);
+      html.dark-mode {
+        --bg-main: linear-gradient(
+          180deg,
+          #001f3f 0%,
+          #001f3f 10%,
+          #0a2d50 35%,
+          #0f1e30 65%,
+          #001f3f 90%,
+          #001f3f 100%
+        );
         --bg-solid: #001f3f;
         --container-bg: rgba(0, 0, 0, 0.5);
         --text-color: #ffffff;
@@ -43,6 +59,26 @@
         --back-btn-bg: #7da8d6;
         --back-btn-text: #0f1720;
         /* 개나리 느낌 노랑 */
+        --moon-color: #ffd93b;
+      }
+      /* body도 변수 상속받도록 */
+      body.dark-mode {
+        --bg-main: linear-gradient(
+          180deg,
+          #001f3f 0%,
+          #001f3f 10%,
+          #0a2d50 35%,
+          #0f1e30 65%,
+          #001f3f 90%,
+          #001f3f 100%
+        );
+        --bg-solid: #001f3f;
+        --container-bg: rgba(0, 0, 0, 0.5);
+        --text-color: #ffffff;
+        --glass-white: rgba(255, 255, 255, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --back-btn-bg: #7da8d6;
+        --back-btn-text: #0f1720;
         --moon-color: #ffd93b;
       }
       /* 전체 스크롤 제거 + 상하단 배경 연결 */
@@ -662,6 +698,7 @@
         themeClicks++;
         if (themeClicks === 1) {
           document.body.classList.toggle('dark-mode');
+          document.documentElement.classList.toggle('dark-mode');
           updateThemeMeta();
           setTimeout(() => {
             themeClicks = 0;
