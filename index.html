@@ -508,11 +508,9 @@
           ans: `O`,
         },
         19: {
-          q: `다음은 사범대 2층 사진입니다. \n무엇이 문제일까요?`,
-          opt: [
-            `사진은 테이블을 참고해 주세요`,
-            `정답은 운영진에게 말해주세요`,
-          ],
+          q: `다음은 사범대 2층 사진입니다. 무엇이 문제일까요? 
+              \n사진은 테이블을 참고해 주세요`,
+          opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
         20: {
@@ -521,16 +519,15 @@
           ans: `X`,
         },
         21: {
-          q: `우리 학교 장애학생지원센터는 어디에 있을까요?`,
+          q: `우리 학교 장애학생지원센터는 어디에 있을까요? \n
+              힌트는 공식 인스타그램을 참고해 보세요!`,
           opt: [`혜당관 410호`, `혜당관 412호`, `혜당관 414호`, `혜당관 416호`],
           ans: `혜당관 412호`,
         },
         22: {
-          q: `장애학생지원센터의 슬로건은 무엇일까요?`,
-          opt: [
-            `힌트는 공식 인스타그램을 참고해 보세요!`,
-            `정답은 운영진에게 말해주세요`,
-          ],
+          q: `장애학생지원센터의 슬로건은 무엇일까요? \n
+              힌트는 공식 인스타그램을 참고해 보세요!`,
+          opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
         23: {
@@ -555,11 +552,9 @@
           ans: `O`,
         },
         27: {
-          q: `장애학생지원센터에는 잠시 누워서 쉴 수 있는 침대가 몇 개 있을까요?`,
-          opt: [
-            `힌트는 공식 인스타그램을 참고해 보세요!`,
-            `정답은 운영진에게 말해주세요`,
-          ],
+          q: `장애학생지원센터에는 잠시 누워서 쉴 수 있는 침대가 몇 개 있을까요? \n
+              힌트는 공식 인스타그램을 참고해 보세요!`,
+          opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
         28: {
@@ -575,9 +570,10 @@
           ans: `X`,
         },
         30: {
-          q: `관리자 모드: 초기화하시겠습니까?`,
-          opt: [`리셋하기`, `취소`],
-          ans: `리셋하기`,
+          q: `단국대학교 장애학생지원센터의 지원 내용이 아닌 것은? \n
+              힌트는 공식 인스타그램을 참고해 보세요!`,
+          opt: [`대체 자료 제작`, `이동 보조`, `장애인증 발급`, `속기사 지원`],
+          ans: `장애인증 발급`,
         },
       };
       const checkLock = () => localStorage.getItem('quiz_completed') === 'true';
@@ -596,18 +592,8 @@
         for (let i = 1; i <= 30; i++) {
           const card = document.createElement('div');
           card.innerText = i;
-          card.className =
-            'card' +
-            (isLocked ? ' locked' : '') +
-            (i === 30 ? ' admin-gate' : '');
+          card.className = 'card' + (isLocked ? ' locked' : '');
           card.onclick = () => {
-            if (i === 30) {
-              if (confirm('모든 기록을 리셋할까요?')) {
-                localStorage.removeItem('quiz_completed');
-                location.reload();
-              }
-              return;
-            }
             if (!checkLock()) showQuiz(i);
           };
           grid.appendChild(card);
@@ -692,7 +678,7 @@
         const typeLabel = getQuizTypeLabel(qType);
         (async () => {
           await speak(`${num}번 문제입니다.`);
-          await new Promise((r) => setTimeout(r, 500));
+          await new Promise((r) => setTimeout(r, 300));
           await speak(typeLabel);
           await speak(data.q);
           if (qType === 'choice') {
@@ -719,6 +705,7 @@
         const msg = document.getElementById('result-msg');
         msg.innerHTML = '';
         if (correctAns !== 'staff') {
+          window.speechSynthesis.cancel();
           if (userAns === correctAns) {
             msg.innerHTML =
               "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
