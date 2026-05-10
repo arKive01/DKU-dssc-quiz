@@ -331,6 +331,18 @@
       #quiz-page {
         display: none;
       }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-7px);
+        }
+      }
+      .footer.nudging {
+        animation: float 2s ease-in-out infinite;
+      }
     </style>
   </head>
   <body>
@@ -352,6 +364,18 @@
         <button onclick="goBack()" class="back-btn">목록으로 돌아가기</button>
       </div>
     </div>
+    <canvas
+      id="confetti-canvas"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+      "
+    ></canvas>
     <div class="bottom-bar">
       <a
         href="https://www.instagram.com/dku_dssc"
@@ -604,6 +628,33 @@
           });
         }
       }
+      function getQuizType(data) {
+        if (data.ans === 'staff') return 'staff';
+        if (
+          data.opt.length === 2 &&
+          data.opt.includes('O') &&
+          data.opt.includes('X')
+        )
+          return 'ox';
+        if (data.opt.length >= 2) return 'choice';
+        return 'short';
+      }
+      function getQuizTypeLabel(type) {
+        if (type === 'ox') return 'O X 문제입니다.';
+        if (type === 'choice') return '선지형 문제입니다.';
+        if (type === 'short') return '단답형 문제입니다.';
+        return '주관식 문제입니다.';
+      }
+      /* ★ 인스타 넛지를 보여줄 문항 번호 목록 — 여기서만 번호 추가/제거하면 됩니다 ★ */
+      const NUDGE_QUESTIONS = [21, 22, 27, 30];
+      function setNudge(active) {
+        const footer = document.querySelector('.footer');
+        if (active) {
+          footer.classList.add('nudging');
+        } else {
+          footer.classList.remove('nudging');
+        }
+      }
       function showQuiz(num) {
         const data = quizData[num] || {
           q: `${num}번 준비 중!`,
@@ -634,7 +685,32 @@
           btn.onclick = () => checkAnswer(num, o, data.ans);
           optGrid.appendChild(btn);
         });
-        speak(`${num}번 문제입니다. \n ${data.q}`);
+        /* 인스타 넛지 */
+        setNudge(NUDGE_QUESTIONS.includes(num));
+        /* TTS */
+        const qType = getQuizType(data);
+        const typeLabel = getQuizTypeLabel(qType);
+        (async () => {
+          await speak(`${num}번 문제입니다.`);
+          await new Promise((r) => setTimeout(r, 500));
+          await speak(typeLabel);
+          await speak(data.q);
+          if (qType === 'choice') {
+            const realOpts = data.opt.filter(
+              (o) =>
+                !o.includes('인스타그램') &&
+                !o.includes('Instagram') &&
+                !o.includes('instagram') &&
+                !o.includes('운영진'),
+            );
+            if (realOpts.length > 0) {
+              await speak('보기입니다.');
+              for (let i = 0; i < realOpts.length; i++) {
+                await speak(`${i + 1}번. ${realOpts[i]}`);
+              }
+            }
+          }
+        })();
       }
       function checkAnswer(num, userAns, correctAns) {
         if (correctAns !== 'staff') {
@@ -646,10 +722,11 @@
           if (userAns === correctAns) {
             msg.innerHTML =
               "<span style='color: #27ae60;'>정답입니다! 🎉</span>";
-            fireConfetti();
+            startCelebration();
           } else {
             msg.innerHTML =
               "<span style='color: #e74c3c;'>아쉽네요! 다음에 다시 도전해주세요</span>";
+            playWrongSound();
           }
         }
         document.getElementById('options-grid').style.pointerEvents = 'none';
@@ -661,31 +738,177 @@
             localStorage.removeItem('quiz_completed');
           }
         }
+        setNudge(false);
         document.getElementById('main-page').style.display = 'block';
         document.getElementById('quiz-page').style.display = 'none';
         document.getElementById('result-msg').innerHTML = '';
         solveTime = null;
         updateGrid();
       }
-      function fireConfetti() {
-        const emojis = ['🎉', '🎊', '✨', '🎈', '⭐'];
-        for (let i = 0; i < 40; i++) {
-          const c = document.createElement('div');
-          c.style.position = 'fixed';
-          c.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-          c.style.left = Math.random() * 100 + 'vw';
-          c.style.top = '-50px';
-          c.style.fontSize = '40px';
-          c.style.zIndex = '3000';
-          c.style.transition = `all ${Math.random() * 2 + 2}s linear`;
-          document.body.appendChild(c);
-          setTimeout(() => {
-            c.style.top = '110vh';
-            c.style.transform = `rotate(${Math.random() * 360}deg)`;
-          }, 50);
-          setTimeout(() => c.remove(), 4000);
+      /* ── 폭죽 이펙트 (골드 에디션) ── */
+      const confettiCanvas = document.getElementById('confetti-canvas');
+      const confettiCtx = confettiCanvas.getContext('2d', { alpha: true });
+      let confettiParticles = [];
+      let confettiAnimating = false;
+      function resizeConfetti() {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeConfetti);
+      resizeConfetti();
+
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      function playDingDongDang() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const notes = [523.25, 659.25, 783.99];
+        notes.forEach((freq, i) => {
+          const startTime = now + i * 0.22;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, startTime);
+          gain.gain.setValueAtTime(0, startTime);
+          gain.gain.linearRampToValueAtTime(0.28, startTime + 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.4);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.5);
+        });
+      }
+      function playWrongSound() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        [0, 0.13].forEach((offset) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(880, now + offset);
+          osc.frequency.linearRampToValueAtTime(440, now + offset + 0.1);
+          gain.gain.setValueAtTime(0.45, now + offset);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.12);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + offset);
+          osc.stop(now + offset + 0.13);
+        });
+      }
+
+      class ConfettiParticle {
+        constructor(x, y, color) {
+          this.x = x;
+          this.y = y;
+          this.color = color;
+          const angle = Math.random() * Math.PI * 2;
+          const force = Math.random() * 8 + 3;
+          this.vx = Math.cos(angle) * force;
+          this.vy = Math.sin(angle) * force;
+          this.friction = 0.96;
+          this.gravity = 0.09;
+          this.alpha = 1;
+          this.decay = Math.random() * 0.008 + 0.006;
+          this.history = [];
+          this.maxHistory = 20;
+        }
+        update() {
+          this.vx *= this.friction;
+          this.vy *= this.friction;
+          this.vy += this.gravity;
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+          this.history.push({ x: this.x, y: this.y });
+          if (this.history.length > this.maxHistory) this.history.shift();
+        }
+        draw() {
+          const h = this.history;
+          const len = h.length;
+          if (len < 2) return;
+          confettiCtx.globalAlpha = this.alpha > 0 ? this.alpha : 0;
+          confettiCtx.globalCompositeOperation = 'multiply';
+          confettiCtx.beginPath();
+          confettiCtx.moveTo(h[0].x, h[0].y);
+          for (let i = 1; i < len; i++) {
+            confettiCtx.lineTo(h[i].x, h[i].y);
+          }
+          confettiCtx.strokeStyle = this.color;
+          confettiCtx.lineWidth = 2.5;
+          confettiCtx.lineCap = 'round';
+          confettiCtx.stroke();
+          if (this.alpha > 0.4) {
+            confettiCtx.globalCompositeOperation = 'lighter';
+            confettiCtx.fillStyle = '#fff';
+            if (this.alpha > 0.6) {
+              confettiCtx.shadowBlur = 4;
+              confettiCtx.shadowColor = this.color;
+            }
+            confettiCtx.fillRect(this.x - 1.2, this.y - 1.2, 2.4, 2.4);
+            confettiCtx.shadowBlur = 0;
+          }
         }
       }
+      function createBurst() {
+        const x =
+          Math.random() * (confettiCanvas.width * 0.8) +
+          confettiCanvas.width * 0.1;
+        const y = Math.random() * (confettiCanvas.height * 0.4) + 120;
+        const colors = [
+          '#FFD700',
+          '#F7E7CE',
+          '#FFDF00',
+          '#FFF5EE',
+          '#FFC0CB',
+          '#FFFFFF',
+        ];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        for (let i = 0; i < 90; i++) {
+          confettiParticles.push(new ConfettiParticle(x, y, color));
+        }
+      }
+      function animateConfetti() {
+        confettiAnimating = true;
+        confettiCtx.globalCompositeOperation = 'source-over';
+        confettiCtx.globalAlpha = 0.18;
+        confettiCtx.clearRect(
+          0,
+          0,
+          confettiCanvas.width,
+          confettiCanvas.height,
+        );
+        confettiCtx.globalAlpha = 1;
+        for (let i = confettiParticles.length - 1; i >= 0; i--) {
+          const p = confettiParticles[i];
+          p.update();
+          if (p.alpha <= 0) {
+            confettiParticles.splice(i, 1);
+          } else {
+            p.draw();
+          }
+        }
+        if (confettiParticles.length > 0) {
+          requestAnimationFrame(animateConfetti);
+        } else {
+          confettiAnimating = false;
+          confettiCtx.clearRect(
+            0,
+            0,
+            confettiCanvas.width,
+            confettiCanvas.height,
+          );
+        }
+      }
+      function startCelebration() {
+        playDingDongDang();
+        let burstCount = 0;
+        const interval = setInterval(() => {
+          createBurst();
+          burstCount++;
+          if (burstCount >= 10) clearInterval(interval);
+          if (!confettiAnimating) animateConfetti();
+        }, 220);
+      }
+      /* ── 폭죽 이펙트 끝 ── */
       let themeClicks = 0;
       function handleThemeClick() {
         const btn = document.getElementById('themeBtn');
