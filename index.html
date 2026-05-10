@@ -156,6 +156,18 @@
           bottom: 18px !important;
         }
       }
+      @media (max-width: 390px) {
+        .grid {
+          gap: 8px;
+        }
+        .card {
+          font-size: 1rem;
+          border-radius: 14px;
+        }
+        .container {
+          padding: 18px 12px;
+        }
+      }
       .card {
         aspect-ratio: 1 / 1;
         display: flex;
@@ -331,70 +343,24 @@
       #quiz-page {
         display: none;
       }
-      @keyframes float {
+
+      /* 인스타 넛지 — 리퀴드 글라스 플로팅 + 은은한 외부 광선 */
+      @keyframes float-glow {
         0%,
         100% {
           transform: translateY(0) scale(1);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
         }
-
         50% {
-          transform: translateY(-14px) scale(1.06);
+          transform: translateY(-10px) scale(1.05);
+          box-shadow:
+            0 0 16px rgba(255, 255, 255, 0.5),
+            0 0 32px rgba(210, 235, 255, 0.3),
+            0 12px 24px rgba(0, 0, 0, 0.1);
         }
-      }
-
-      @keyframes shine {
-        0% {
-          left: -120%;
-        }
-
-        100% {
-          left: 160%;
-        }
-      }
-
-      .footer {
-        position: relative;
-        overflow: hidden;
-      }
-
-      .footer.nudging {
-        animation: float 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-
-        box-shadow:
-          0 0 20px rgba(255, 255, 255, 0.5),
-          0 0 40px rgba(120, 190, 255, 0.45),
-          0 10px 30px rgba(0, 0, 0, 0.12);
-      }
-
-      .footer.nudging::before {
-        content: '';
-
-        position: absolute;
-
-        top: -40%;
-        left: -120%;
-
-        width: 70%;
-        height: 180%;
-
-        background: linear-gradient(
-          120deg,
-          transparent,
-          rgba(255, 255, 255, 0.55),
-          transparent
-        );
-
-        transform: rotate(18deg);
-
-        animation: shine 1.8s linear infinite;
       }
       .footer.nudging {
-        animation: float 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-
-        box-shadow:
-          0 0 20px rgba(255, 255, 255, 0.5),
-          0 0 40px rgba(120, 190, 255, 0.45),
-          0 10px 30px rgba(0, 0, 0, 0.12);
+        animation: float-glow 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
       }
     </style>
   </head>
@@ -561,8 +527,8 @@
           ans: `O`,
         },
         19: {
-          q: `다음은 사범대 2층 사진입니다. 무엇이 문제일까요? 
-              \n사진은 테이블을 참고해 주세요`,
+          q: `다음은 사범대 2층 사진입니다. 무엇이 문제일까요? \n
+              사진은 테이블을 참고해 주세요`,
           opt: [`정답은 운영진에게 말해주세요`],
           ans: `staff`,
         },
@@ -944,7 +910,7 @@
         const interval = setInterval(() => {
           createBurst();
           burstCount++;
-          if (burstCount >= 10) clearInterval(interval);
+          if (burstCount >= 8) clearInterval(interval);
           if (!confettiAnimating) animateConfetti();
         }, 220);
       }
